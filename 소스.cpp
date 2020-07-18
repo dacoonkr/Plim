@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <stack>
 using namespace std;
 
 class Data {
@@ -13,6 +14,8 @@ char keyWords[] = { '(',')',',','+','-','/','*' };
 string types[5] = { "Keyword : ", "Function: ", "Variable: ", "String  : ", "Number  : " };
 
 vector<Data> tokens;
+vector<Data> postfixed;
+
 
 string code;
 string now;
@@ -20,7 +23,87 @@ string now;
 int main() {
 	while (cin >> code) {
 		void splitTokens();
+		void postfix();
+
 		splitTokens();
+		postfix();
+	}
+}
+
+void postfix() {
+	int priority(char);
+	stack<string> keyWordStack;
+	for (int i = 0; i < tokens.size(); i++) {
+		if (tokens[i].type == 0) {
+			if (tokens[i].data == ",") {
+				continue;
+			}
+			if (tokens[i].data == "(") {
+				continue;
+			}
+			else if (tokens[i].data == ")") {
+				while (1) {
+					if (keyWordStack.empty()) break;
+					else if (keyWordStack.top()[keyWordStack.top().length() - 1] == '(') {
+						Data tmp;
+						tmp.data = keyWordStack.top().substr(0, keyWordStack.top().length() - 1);
+						tmp.type = 1;
+						postfixed.push_back(tmp);
+						keyWordStack.pop();
+						break;
+					}
+					else if (keyWordStack.top() == ",") {
+						keyWordStack.pop();
+					}
+					else {
+						Data tmp;
+						tmp.data = keyWordStack.top();
+						tmp.type = 0;
+						postfixed.push_back(tmp);
+						keyWordStack.pop();
+					}
+				}
+			}
+			else {
+				while (1) {
+					if (keyWordStack.empty()) break;
+					else if (keyWordStack.top()[keyWordStack.top().length() - 1] == '(') {
+						break;
+					}
+					else if (priority(keyWordStack.top()[0]) < priority(tokens[i].data[0])) {
+						break;
+					}
+					Data tmp;
+					tmp.data = keyWordStack.top();
+					tmp.type = 0;
+					postfixed.push_back(tmp);
+					keyWordStack.pop();
+				}
+				keyWordStack.push(tokens[i].data);
+			}
+		}
+		else if (tokens[i].type == 1) {
+			keyWordStack.push(tokens[i].data + "(");
+		}
+		else {
+			postfixed.push_back(tokens[i]);
+		}
+	}
+	while (!keyWordStack.empty()) {
+		Data tmp;
+		tmp.data = keyWordStack.top();
+		tmp.type = 0;
+		postfixed.push_back(tmp);
+		keyWordStack.pop();
+	}
+}
+
+int priority(char ch) {
+	switch (ch) {
+	case '*': case '/':
+		return 0x7fffffff;
+	case '+': case '-':
+		return 0x7fffffff - 1;
 	}
 }
 
@@ -88,5 +171,7 @@ void splitTokens() {
 			tmp.data = now;
 			tmp.type = 2;
 		}
+		tokens.push_back(tmp);
 	}
 }
+
