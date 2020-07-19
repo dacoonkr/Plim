@@ -18,7 +18,7 @@ public:
 	string data;
 };
 
-char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':' };
+char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':',';' };
 string types[6] = { "Keyword : ", "Function: ", "Variable: ", "String  : ", "Number  : ", "ParamCnt:" };
 
 vector<Data> tokens;
@@ -31,7 +31,7 @@ string code;
 string now;
 
 int main() {
-	while (cout << ">> ", cin >> code) {
+	while (cout << ">>> ", cin >> code) {
 		void splitTokens();
 		void postfix();
 		void run();
@@ -42,10 +42,8 @@ int main() {
 
 		run();
 
-		for (int i = 0; i < runtime.size(); i++) {
-			cout << types[runtime.top().type] << runtime.top().data << endl;
-			runtime.pop();
-		}
+		cout << runtime.top().data << endl;
+		runtime.pop();
 
 		tokens.clear();
 		postfixed.clear();
@@ -57,6 +55,9 @@ void run() {
 	for (int i = 0; i < postfixed.size(); i++) {
 		if (postfixed[i].type == 3 || postfixed[i].type == 4) {
 			runtime.push(postfixed[i]);
+		}
+		else if (postfixed[i].data[0] == ';') {
+			while (!runtime.empty()) runtime.pop();
 		}
 		else if (postfixed[i].type == 2 && postfixed[i].data[0] != '$') {
 			Data tmp;
@@ -134,6 +135,9 @@ void run() {
 					tmp2.data = "0";
 					tmp2.type = 2;
 					runtimeVariable.insert(make_pair(b.data.substr(1), tmp2));
+					tmp.type = 2;
+					tmp.data = b.data;
+					runtime.push(tmp);
 				}
 				break;
 			case '=':
@@ -141,6 +145,9 @@ void run() {
 				tmp2.data = b.data;
 				tmp2.type = b.type - 2;
 				runtimeVariable[a.data.substr(1)] = tmp2;
+				tmp.type = b.type;
+				tmp.data = b.data;
+				runtime.push(tmp);
 				break;
 			}
 		}
@@ -164,6 +171,19 @@ void postfix() {
 				}
 				keyWordStack.push(",");
 				continue;
+			}
+			else if (tokens[i].data == ";") {
+				while (!keyWordStack.empty()) {
+					Data tmp;
+					tmp.data = keyWordStack.top();
+					tmp.type = 0;
+					postfixed.push_back(tmp);
+					keyWordStack.pop();
+				}
+				Data tmp;
+				tmp.data = ";";
+				tmp.type = 0;
+				postfixed.push_back(tmp);
 			}
 			else if (tokens[i].data == "(") {
 				continue;
