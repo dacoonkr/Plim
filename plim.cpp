@@ -18,7 +18,7 @@ public:
 	string data;
 };
 
-char keyWords[] = { '(',')',',','+','-','/','*','=' };
+char keyWords[] = { '(',')',',','+','-','/','*','=','%','^' };
 string types[6] = { "Keyword : ", "Function: ", "Variable: ", "String  : ", "Number  : ", "ParamCnt:" };
 
 vector<Data> tokens;
@@ -104,6 +104,19 @@ void run() {
 			case '/':
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) / stod(b.data);
+				tmp.data = number_to_string.str();
+				while (tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.')
+					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
+				runtime.push(tmp);
+				break;
+			case '%':
+				tmp.type = 4;
+				tmp.data = to_string(stoi(a.data) % stoi(b.data));
+				runtime.push(tmp);
+				break;
+			case '^':
+				tmp.type = 4;
+				number_to_string << fixed << setprecision(15) << pow(stod(a.data), stod(b.data));
 				tmp.data = number_to_string.str();
 				while (tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.')
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
@@ -202,12 +215,14 @@ void postfix() {
 
 int priority(char ch) {
 	switch (ch) {
-	case '*': case '/':
-		return 0x7fffffff;
+	case '^':
+		return 0x7fffffff - 15;
+	case '*': case '/': case '%':
+		return 0x7fffffff - 16;
 	case '+': case '-':
-		return 0x7fffffff - 1;
-	case ':':
-		return 0x7fffffff - 2;
+		return 0x7fffffff - 17;
+	case '=': case ':':
+		return 0x7fffffff - 18;
 	}
 }
 
