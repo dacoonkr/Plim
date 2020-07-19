@@ -18,7 +18,7 @@ public:
 	string data;
 };
 
-char keyWords[] = { '(',')',',','+','-','/','*','=','%','^' };
+char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':' };
 string types[6] = { "Keyword : ", "Function: ", "Variable: ", "String  : ", "Number  : ", "ParamCnt:" };
 
 vector<Data> tokens;
@@ -39,6 +39,7 @@ int main() {
 
 		splitTokens();
 		postfix();
+
 		run();
 
 		for (int i = 0; i < runtime.size(); i++) {
@@ -57,10 +58,15 @@ void run() {
 		if (postfixed[i].type == 3 || postfixed[i].type == 4) {
 			runtime.push(postfixed[i]);
 		}
-		else if (postfixed[i].type == 2) {
+		else if (postfixed[i].type == 2 && postfixed[i].data[0] != '$') {
 			Data tmp;
 			tmp.data = runtimeVariable[postfixed[i].data].data;
 			tmp.type = runtimeVariable[postfixed[i].data].type + 2;
+			runtime.push(tmp);
+		}
+		else if (postfixed[i].type == 2) {
+			Data tmp;
+			tmp.data = postfixed[i].data;
 			runtime.push(tmp);
 		}
 		else if (postfixed[i].type == 0) {
@@ -80,7 +86,7 @@ void run() {
 					tmp.type = 4;
 					number_to_string << fixed << setprecision(15) << stod(a.data) + stod(b.data);
 					tmp.data = number_to_string.str();
-					while (tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.')
+					while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
 						tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 					runtime.push(tmp);
 				}
@@ -89,7 +95,7 @@ void run() {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) - stod(b.data);
 				tmp.data = number_to_string.str();
-				while (tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.')
+				while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime.push(tmp);
 				break;
@@ -97,7 +103,7 @@ void run() {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) * stod(b.data);
 				tmp.data = number_to_string.str();
-				while (tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.')
+				while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime.push(tmp);
 				break;
@@ -105,7 +111,7 @@ void run() {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) / stod(b.data);
 				tmp.data = number_to_string.str();
-				while (tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.')
+				while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime.push(tmp);
 				break;
@@ -118,9 +124,23 @@ void run() {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << pow(stod(a.data), stod(b.data));
 				tmp.data = number_to_string.str();
-				while (tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.')
+				while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime.push(tmp);
+				break;
+			case ':':
+				if (a.data == "$new") {
+					Variable tmp2;
+					tmp2.data = "0";
+					tmp2.type = 2;
+					runtimeVariable.insert(make_pair(b.data.substr(1), tmp2));
+				}
+				break;
+			case '=':
+				Variable tmp2;
+				tmp2.data = b.data;
+				tmp2.type = b.type - 2;
+				runtimeVariable[a.data.substr(1)] = tmp2;
 				break;
 			}
 		}
