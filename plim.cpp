@@ -5,6 +5,7 @@
 #include <stack>
 #include <map>
 #include <iomanip>
+#include "error.h"
 using namespace std;
 
 class Data {
@@ -30,8 +31,11 @@ map<string, Variable> runtimeVariable;
 string code;
 string now;
 
+char buffer[10005];
+
 int main() {
-	while (cout << ">>> ", cin >> code) {
+	while (cout << ">>> ", cin.getline(buffer, 10005)) {
+		code = buffer;
 		void splitTokens();
 		void postfix();
 		void run();
@@ -41,14 +45,17 @@ int main() {
 		postfix();
 
 		run();
-
-		cout << runtime.top().data << endl;
-		runtime.pop();
+		cout << '\n';
 
 		tokens.clear();
 		postfixed.clear();
 		while (!runtime.empty()) runtime.pop();
 	}
+}
+
+void error(string run, string a) {
+	cout << "런타임 에러: " << run << "에서 " << a << "\n";
+	exit(0);
 }
 
 void run() {
@@ -151,6 +158,40 @@ void run() {
 				break;
 			}
 		}
+		else if (postfixed[i].type == 1) {
+			stack<Data> tmparam;
+			vector<Data> parameter;
+			int paramCnt = stoi(runtime.top().data);
+			runtime.pop();
+			for (int j = 0; j < paramCnt; j++) {
+				tmparam.push(runtime.top());
+				runtime.pop();
+			}
+			for (int j = 0; j < paramCnt; j++) {
+				parameter.push_back(tmparam.top());
+				tmparam.pop();
+			}
+
+			if (postfixed[i].data == "exit") {
+				if (paramCnt != 1) error(postfixed[i].data, pl_1000);
+				if (parameter[0].type != 4) error(postfixed[i].data, pl_1001);
+				exit(stoi(parameter[0].data));
+			}
+			if (postfixed[i].data == "system") {
+				if (paramCnt != 1) error(postfixed[i].data, pl_1000);
+				if (parameter[0].type != 3) error(postfixed[i].data, pl_1001);
+				system(parameter[0].data.c_str());
+			}
+			if (postfixed[i].data == "print") {
+				for (int m = 0; m < parameter.size(); m++) {
+					cout << parameter[m].data;
+				}
+			}
+			break;
+		}
+		else if (postfixed[i].type == 5) {
+			runtime.push(postfixed[i]);
+		}
 	}
 }
 
@@ -186,21 +227,33 @@ void postfix() {
 				postfixed.push_back(tmp);
 			}
 			else if (tokens[i].data == "(") {
+				keyWordStack.push("(");
 				continue;
 			}
 			else if (tokens[i].data == ")") {
+				while (!keyWordStack.empty()) {
+					if (keyWordStack.top()[keyWordStack.top().length() - 1] == '(') break;
+					if (keyWordStack.top() == ",") break;
+					Data tmp;
+					tmp.data = keyWordStack.top();
+					tmp.type = 0;
+					postfixed.push_back(tmp);
+					keyWordStack.pop();
+				}
 				int paramcnt = 1;
 				while (1) {
 					if (keyWordStack.empty()) break;
 					else if (keyWordStack.top()[keyWordStack.top().length() - 1] == '(') {
-						Data tmp;
-						tmp.data = keyWordStack.top().substr(0, keyWordStack.top().length() - 1);
-						tmp.type = 1;
-						postfixed.push_back(tmp);
+						if (keyWordStack.top() != "(") {
+							Data tmp;
+							tmp.data = to_string(paramcnt);
+							tmp.type = 5;
+							postfixed.push_back(tmp);
+							tmp.data = keyWordStack.top().substr(0, keyWordStack.top().length() - 1);
+							tmp.type = 1;
+							postfixed.push_back(tmp);
+						}
 						keyWordStack.pop();
-						tmp.data = to_string(paramcnt);
-						tmp.type = 5;
-						postfixed.push_back(tmp);
 						break;
 					}
 					else if (keyWordStack.top() == ",") {
@@ -239,6 +292,7 @@ void postfix() {
 		}
 		else if (tokens[i].type == 1) {
 			keyWordStack.push(tokens[i].data + "(");
+			i++;
 		}
 		else {
 			postfixed.push_back(tokens[i]);
@@ -276,6 +330,7 @@ void splitTokens() {
 		if (isInStr) {
 			now += code[i];
 		}
+		else if (code[i] == ' ') continue;
 		else {
 			bool isKeyWord = false;
 			for (int j = 0; j < sizeof(keyWords); j++) {
