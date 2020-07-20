@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <stack>
@@ -35,15 +36,15 @@ char buffer[10005];
 
 int main() {
 	while (cout << ">>> ", cin.getline(buffer, 10005)) {
-		code = buffer;
-		void splitTokens();
-		void postfix();
+		void compile();
 		void run();
+		void load();
+		code = buffer;
 		now = "";
 
-		splitTokens();
-		postfix();
+		compile();
 
+		load();
 		run();
 		cout << '\n';
 
@@ -53,12 +54,35 @@ int main() {
 	}
 }
 
+void compile() {
+	void splitTokens();
+	void postfix();
+	splitTokens();
+	postfix();
+	ofstream output("code.plm", ios::out | ios::binary);
+	int tmp = (int)postfixed.size();
+	output.write((char*)&tmp, sizeof(int));
+	for (int i = 0; i < postfixed.size(); i++) {
+		int type = postfixed[i].type;
+		output.write((char*)&type, sizeof(int));
+		int length = postfixed[i].data.length();
+		output.write((char*)&length, sizeof(int));
+		for (int j = 0; j < length; j++) {
+			output.write(&postfixed[i].data[j], sizeof(char));
+		}
+	}
+	output.close();
+	postfixed.clear();
+}
+
 void error(string run, string a) {
-	cout << "ëŸ°íƒ€ìž„ ì—ëŸ¬: " << run << "ì—ì„œ " << a << "\n";
+	cout << "¿¡·¯ ¹ß»ý: " << run << "¿¡¼­ " << a << "\n";
 	exit(0);
 }
 
 void run() {
+	void load();
+	load();
 	for (int i = 0; i < postfixed.size(); i++) {
 		if (postfixed[i].type == 3 || postfixed[i].type == 4) {
 			runtime.push(postfixed[i]);
@@ -387,4 +411,31 @@ void splitTokens() {
 		}
 		tokens.push_back(tmp);
 	}
+}
+
+void load() {
+	ifstream output("code.plm", ios::out | ios::binary);
+	int s;
+	output.read((char*)&s, sizeof(int));
+	for (int i = 0; i < s; i++) {
+		Data tmp;
+
+		int type;
+		output.read((char*)&type, sizeof(int));
+		tmp.type = type;
+
+		int length;
+		output.read((char*)&length, sizeof(int));
+
+		char buffer[10005]; int bufferlen = 0;
+		for (int j = 0; j < length; j++) {
+			char tmp;
+			output.read(&tmp, sizeof(char));
+			buffer[bufferlen++] = tmp;
+		}
+		buffer[bufferlen] = 0;
+		tmp.data += buffer;
+		postfixed.push_back(tmp);
+	}
+	output.close();
 }
