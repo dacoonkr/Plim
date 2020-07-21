@@ -10,5 +10,7 @@ int priority(char ch) {
 		return 0x7fffffff - 17;
 	case '=': case ':':
 		return 0x7fffffff - 18;
+	default:
+		return -1;
 	}
 }
