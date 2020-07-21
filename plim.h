@@ -325,6 +325,7 @@ void postfix() {
 					else if (keyWordStack.top() == ",") {
 						break;
 					}
+					else if (keyWordStack.top()[0] == '^' && tokens[i].data[0] == '^') break;
 					else if (priority(keyWordStack.top()[0]) < priority(tokens[i].data[0])) {
 						break;
 					}
