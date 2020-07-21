@@ -137,7 +137,6 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					cout << parameter[m].data;
 				}
 			}
-			break;
 		}
 		else if (postfixed->at(i).type == 5) {
 			runtime->push(postfixed->at(i));

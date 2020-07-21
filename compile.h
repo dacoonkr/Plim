@@ -2,14 +2,13 @@
 
 #include <fstream>
 #include <vector>
+#include "token.h"
 #include "classes.h"
 using namespace std;
 
-void compile(vector<Data>* postfixed) {
-	void splitTokens();
-	void postfix();
-	splitTokens();
-	postfix();
+void compile(string code, vector<Data>* postfixed, vector<Data>* tokens) {
+	splitTokens(code, tokens);
+	postfix(tokens, postfixed);
 	ofstream output("code.plm", ios::out | ios::binary);
 	int tmp = (int)postfixed->size();
 	output.write((char*)&tmp, sizeof(int));
