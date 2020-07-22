@@ -17,6 +17,7 @@
 | 2        | a % b    | a mod b             |
 | 3        | a + b    | a plus b            |
 | 3        | a - b    | a minus b           |
+| 4        | $a = b   | assign a to b       |
 
 ## Basic Function
 
