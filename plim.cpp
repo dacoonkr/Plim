@@ -1,6 +1,5 @@
 #include "plim.h"
 
-char buffer[10005];
 string codes;
 
 int main(int argc, char** argv) {
@@ -26,19 +25,23 @@ int main(int argc, char** argv) {
 		}
 	}
 	else {
-		while (cout << ">>> ", cin.getline(buffer, 10005)) {
-			string tmps = buffer;
-			codes = buffer;
+		string tmps;
+		cout << ">>> ";
+		while (getline(cin, tmps)) {
+			codes = tmps;
 			if (tmps.length() > 0) if (tmps[tmps.length() - 1] != ';') {
 				while (1) {
-					cout << "  > ", cin.getline(buffer, 10005);
-					string tmps = buffer;
+					string tmps;
+					cout << "  > ", getline(cin, tmps);
 					codes += ";";
-					codes += buffer;
+					codes += tmps;
 					if (tmps.length() > 0) { if (tmps[tmps.length() - 1] == ';') break; }
 				}
 			}
-			compile_and_run(codes);
+			if (codes != "") {
+				compile_and_run(codes);
+				cout << ">>> ";
+			}
 		}
 	}
 }

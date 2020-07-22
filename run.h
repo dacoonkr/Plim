@@ -17,10 +17,43 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 			while (!runtime->empty()) runtime->pop();
 		}
 		else if (postfixed->at(i).type == 2 && postfixed->at(i).data[0] != '$') {
-			Data tmp;
-			tmp.data = runtimeVariable->find(postfixed->at(i).data)->second.data;
-			tmp.type = runtimeVariable->find(postfixed->at(i).data)->second.type + 2;
-			runtime->push(tmp);
+			if (postfixed->at(i).data == "scanline") {
+				Data tmp;
+				getline(cin, tmp.data);
+				tmp.type = 3;
+				runtime->push(tmp);
+			}
+			else if (postfixed->at(i).data == "scanint") {
+				Data tmp;
+				int tmp2;
+				if (cin >> tmp2) {
+					tmp.data = to_string(tmp2);
+					tmp.type = 4;
+					runtime->push(tmp);
+				}
+				else error(postfixed->at(i).data, pl_1002);
+			}
+			else if (postfixed->at(i).data == "scanfloat") {
+				stringstream number_to_string;
+				Data tmp;
+				double tmp2;
+				if (cin >> tmp2) {
+					tmp.data = to_string(tmp2);
+					tmp.type = 4;
+					number_to_string << fixed << setprecision(15) << tmp2;
+					tmp.data = number_to_string.str();
+					while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
+						tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
+					runtime->push(tmp);
+				}
+				else error(postfixed->at(i).data, pl_1003);
+			}
+			else {
+				Data tmp;
+				tmp.data = runtimeVariable->find(postfixed->at(i).data)->second.data;
+				tmp.type = runtimeVariable->find(postfixed->at(i).data)->second.type + 2;
+				runtime->push(tmp);
+			}
 		}
 		else if (postfixed->at(i).type == 2) {
 			Data tmp;
