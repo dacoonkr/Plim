@@ -101,7 +101,7 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				Variable tmp2;
 				tmp2.data = b.data;
 				tmp2.type = b.type - 2;
-				runtimeVariable->insert(make_pair(a.data.substr(1), tmp2));
+				runtimeVariable->find(a.data.substr(1))->second = tmp2;
 				tmp.type = b.type;
 				tmp.data = b.data;
 				runtime->push(tmp);

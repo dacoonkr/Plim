@@ -8,6 +8,7 @@
 #include <stack>
 #include <map>
 #include <iomanip>
+#include <time.h>
 #include "error.h"
 #include "priority.h"
 #include "compile.h"
@@ -28,10 +29,14 @@ map<string, Variable> runtimeVariable;
 string code;
 
 void compile_and_run(string codes) {
-	code = codes;
+	clock_t start, end;
+	start = clock();
 
-	compile(code, &postfixed, &tokens);
-	plmLoad(&postfixed);
+	code = codes;
+	string output("code.plm");
+
+	compile(code, &postfixed, &tokens, output);
+	plmLoad(&postfixed, output);
 
 	run(&runtime, &postfixed, &runtimeVariable);
 	cout << '\n';
@@ -39,4 +44,38 @@ void compile_and_run(string codes) {
 	tokens.clear();
 	postfixed.clear();
 	while (!runtime.empty()) runtime.pop();
+
+	end = clock();
+	cout << "Done. " << end - start << "ms\n";
+}
+
+void compile_(string codes, string output) {
+	clock_t start, end;
+	start = clock();
+
+	code = codes;
+
+	compile(code, &postfixed, &tokens, output);
+
+	tokens.clear();
+	postfixed.clear();
+	while (!runtime.empty()) runtime.pop();
+
+	end = clock();
+	cout << "Done. " << end - start << "ms\n";
+}
+
+void run_(string output) {
+	clock_t start, end;
+	start = clock();
+
+	plmLoad(&postfixed, output);
+	run(&runtime, &postfixed, &runtimeVariable);
+	cout << '\n';
+	tokens.clear();
+	postfixed.clear();
+	while (!runtime.empty()) runtime.pop();
+
+	end = clock();
+	cout << "Done. " << end - start << "ms\n";
 }

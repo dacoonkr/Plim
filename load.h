@@ -7,8 +7,8 @@
 using namespace std;
 
 
-void plmLoad(vector<Data> *postfixed) {
-	ifstream output("code.plm", ios::out | ios::binary);
+void plmLoad(vector<Data> *postfixed, string outout) {
+	ifstream output(outout, ios::out | ios::binary);
 	int s;
 	output.read((char*)&s, sizeof(int));
 	for (int i = 0; i < s; i++) {

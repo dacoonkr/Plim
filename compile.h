@@ -6,10 +6,10 @@
 #include "classes.h"
 using namespace std;
 
-void compile(string code, vector<Data>* postfixed, vector<Data>* tokens) {
+void compile(string code, vector<Data>* postfixed, vector<Data>* tokens, string outout) {
 	splitTokens(code, tokens);
 	postfix(tokens, postfixed);
-	ofstream output("code.plm", ios::out | ios::binary);
+	ofstream output(outout, ios::out | ios::binary);
 	int tmp = (int)postfixed->size();
 	output.write((char*)&tmp, sizeof(int));
 	for (size_t i = 0; i < postfixed->size(); i++) {
