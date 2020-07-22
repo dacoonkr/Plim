@@ -1,5 +1,13 @@
 # Plim
 
+## Build & Run
+
+> 코드 실행: `plim foo.plim`
+
+> 실행 파일 생성: `plim build foo.plim foo.plm`
+
+> 실행 파일 실행: `plim run foo.plm`
+
 ## Type
 | TypeName | Range                    |
 |----------|--------------------------|
