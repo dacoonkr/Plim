@@ -7,9 +7,18 @@
 #include "syntax_checker.h"
 using namespace std;
 
-char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':',';' };
+char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':',';','\n' };
+
+int splitTK(bool showError, string code, vector<Data>* tokens);
 
 void splitTokens(string code, vector<Data>* tokens) {
+	splitTK(true, code, tokens);
+}
+int OrsplitTokens(string code, vector<Data>* tokens) {
+	return splitTK(false, code, tokens);
+}
+
+int splitTK(bool showError, string code, vector<Data>* tokens) {
 	string now;
 	bool isInStr = false;
 	for (int i = 0; code[i] != '\0'; i++) {
@@ -32,6 +41,7 @@ void splitTokens(string code, vector<Data>* tokens) {
 				}
 			}
 			if (isKeyWord) {
+				if (now == "\n") continue;
 				if (now != "") {
 					Data tmp;
 					if (now[0] == '\"') {
@@ -50,7 +60,10 @@ void splitTokens(string code, vector<Data>* tokens) {
 								break;
 							}
 						}
-						if (!isnumber) error(now, sy_1003);
+						if (!isnumber) { 
+							if (showError) error(now, sy_1003);
+							else return 1;
+						}
 						tmp.data = now;
 						tmp.type = 4;
 					}
@@ -85,7 +98,10 @@ void splitTokens(string code, vector<Data>* tokens) {
 					break;
 				}
 			}
-			if (!isnumber) error(now, sy_1003);
+			if (!isnumber) {
+				if (showError) error(now, sy_1003);
+				else return 1;
+			}
 			tmp.data = now;
 			tmp.type = 4;
 		}
@@ -96,7 +112,7 @@ void splitTokens(string code, vector<Data>* tokens) {
 		now = "";
 		tokens->push_back(tmp);
 	}
-	syntax_check(tokens);
+	return syntax_check(tokens, showError);
 }
 
 void postfix(vector<Data>* tokens, vector<Data> *postfixed) {

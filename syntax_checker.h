@@ -7,31 +7,39 @@
 #include "error.h"
 using namespace std;
 
-void syntax_check(vector<Data> *tokens) {
-	void bracket(vector<Data>*);
-	bracket(tokens);
-	return;
+int syntax_check(vector<Data> *tokens, bool showError) {
+	int bracket(vector<Data>*, bool showError);
+
+	int a = bracket(tokens, showError);
+	return a;
 };
 
-void bracket(vector<Data>* tokens) {
+int bracket(vector<Data>* tokens, bool showError) {
 	stack<string> bracket_st;
 	for (int i = 0; i < tokens->size(); i++) {
 		if (tokens->at(i).get_data() == "(") bracket_st.push("(");
 		if (tokens->at(i).get_data() == ")") {
 			if (i > 0) {
-				if (tokens->at(i - 1).get_data() == "(") error("()", sy_1002);
+				if (tokens->at(i - 1).get_data() == "(") { 
+					if (showError) error("()", sy_1002);
+					else return 1;
+				}
 			}
 			if (bracket_st.empty()) {
-				error(")", sy_1000);
+				if (showError) error(")", sy_1000);
+				else return 1;
 			}
 			else if (bracket_st.top() == "(") {
 				bracket_st.pop();
 			}
 			else {
-				error(")", sy_1000);
+				if (showError) error(")", sy_1000);
+				else return 1;
 			}
 		}
 	}
 	if(!bracket_st.empty())
-		error("소스", sy_1001);
+		if (showError) error("소스", sy_1001);
+		else return 1;
+	return 0;
 }

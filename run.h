@@ -8,10 +8,21 @@
 #include "classes.h"
 using namespace std;
 
+int isKeyVariable(string a) {
+	if (a == "$new") return 1;
+	if (a == "scanint") return 1;
+	if (a == "scanfloat") return 1;
+	if (a == "scanline") return 1;
+	return 0;
+}
+
 void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* runtimeVariable) {
 	for (size_t i = 0; i < postfixed->size(); i++) {
 		if (postfixed->at(i).type == 3 || postfixed->at(i).type == 4) {
 			runtime->push(postfixed->at(i));
+		}
+		else if (postfixed->at(i).type == 0 && postfixed->at(i).data == "\n") {
+			continue;
 		}
 		else if (postfixed->at(i).data[0] == ';') {
 			while (!runtime->empty()) runtime->pop();
