@@ -49,10 +49,15 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				else error(postfixed->at(i).data, pl_1003);
 			}
 			else {
-				Data tmp;
-				tmp.data = runtimeVariable->find(postfixed->at(i).data)->second.data;
-				tmp.type = runtimeVariable->find(postfixed->at(i).data)->second.type + 2;
-				runtime->push(tmp);
+				if (runtimeVariable->find(postfixed->at(i).get_data()) == runtimeVariable->end()) {
+					error(postfixed->at(i).get_data(), pl_1005);
+				}
+				else {
+					Data tmp;
+					tmp.data = runtimeVariable->find(postfixed->at(i).data)->second.data;
+					tmp.type = runtimeVariable->find(postfixed->at(i).data)->second.type + 2;
+					runtime->push(tmp);
+				}
 			}
 		}
 		else if (postfixed->at(i).type == 2) {
@@ -160,16 +165,17 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				if (parameter[0].type != 4) error(postfixed->at(i).data, pl_1001);
 				exit(stoi(parameter[0].data));
 			}
-			if (postfixed->at(i).data == "system") {
+			else if (postfixed->at(i).data == "system") {
 				if (paramCnt != 1) error(postfixed->at(i).data, pl_1000);
 				if (parameter[0].type != 3) error(postfixed->at(i).data, pl_1001);
 				system(parameter[0].data.c_str());
 			}
-			if (postfixed->at(i).data == "print") {
+			else if (postfixed->at(i).data == "print") {
 				for (size_t m = 0; m < parameter.size(); m++) {
 					cout << parameter[m].data;
 				}
 			}
+			else error(postfixed->at(i).data, pl_1004);
 		}
 		else if (postfixed->at(i).type == 5) {
 			runtime->push(postfixed->at(i));

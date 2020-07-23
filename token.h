@@ -4,11 +4,12 @@
 #include <vector>
 #include <stack>
 #include "classes.h"
+#include "syntax_checker.h"
 using namespace std;
 
 char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':',';' };
 
-void splitTokens(string code, vector<Data> *tokens) {
+void splitTokens(string code, vector<Data>* tokens) {
 	string now;
 	bool isInStr = false;
 	for (int i = 0; code[i] != '\0'; i++) {
@@ -19,7 +20,9 @@ void splitTokens(string code, vector<Data> *tokens) {
 		if (isInStr) {
 			now += code[i];
 		}
-		else if (code[i] == ' ') continue;
+		else if (code[i] == ' ') {
+			continue;
+		}
 		else {
 			bool isKeyWord = false;
 			for (int j = 0; j < sizeof(keyWords); j++) {
@@ -40,6 +43,14 @@ void splitTokens(string code, vector<Data> *tokens) {
 						tmp.type = 1;
 					}
 					else if ('-' == now[0] || ('0' <= now[0] && now[0] <= '9')) {
+						bool isnumber = true;
+						for (int j = 0; j < now.length(); j++) {
+							if (!('0' <= now[j] && now[j] <= '9')) {
+								isnumber = false;
+								break;
+							}
+						}
+						if (!isnumber) error(now, sy_1003);
 						tmp.data = now;
 						tmp.type = 4;
 					}
@@ -67,6 +78,14 @@ void splitTokens(string code, vector<Data> *tokens) {
 			tmp.type = 3;
 		}
 		else if ('-' == now[0] || ('0' <= now[0] && now[0] <= '9')) {
+			bool isnumber = true;
+			for (int j = 0; j < now.length(); j++) {
+				if (!('0' <= now[j] && now[j] <= '9')) {
+					isnumber = false;
+					break;
+				}
+			}
+			if (!isnumber) error(now, sy_1003);
 			tmp.data = now;
 			tmp.type = 4;
 		}
@@ -74,8 +93,10 @@ void splitTokens(string code, vector<Data> *tokens) {
 			tmp.data = now;
 			tmp.type = 2;
 		}
+		now = "";
 		tokens->push_back(tmp);
 	}
+	syntax_check(tokens);
 }
 
 void postfix(vector<Data>* tokens, vector<Data> *postfixed) {
