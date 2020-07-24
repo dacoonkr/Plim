@@ -18,9 +18,9 @@
 ## System Variable
 | Variable name | Value                     |
 |---------------|---------------------------|
-| scanInt       | input number(int) value   |
-| scanFloat     | input number(float) value |
-| scanLine      | input string              |
+| scanint       | input number(int) value   |
+| scanfloat     | input number(float) value |
+| scanline      | input string              |
 
 ## Operator
 
