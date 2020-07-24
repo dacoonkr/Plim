@@ -51,7 +51,7 @@ print("Hello, World!");
 ```
 **A+B**
 ```
-$new:$a = scanInt;
-$new:$b = scanInt;
+$new:$a = scanint;
+$new:$b = scanint;
 print(a + b);
 ```
