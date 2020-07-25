@@ -27,7 +27,14 @@ int splitTK(bool showError, string code, vector<Data>* tokens) {
 			if (!isInStr) continue;
 		}
 		if (isInStr) {
-			now += code[i];
+			if (code[i] == '\\') {
+				if (code[i + 1] == '\\')
+					now += code[i], i++;
+				else if (code[i + 1] == 'n')
+					now += '\n', i++;
+			}
+			else now += code[i];
+			continue;
 		}
 		else if (code[i] == ' ') {
 			continue;

@@ -5,6 +5,16 @@
 
 string codes;
 
+std::string ReplaceAll(std::string& str, const std::string& from, const std::string& to) {
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos)
+	{
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); 
+	}
+	return str;
+}
+
 int main(int argc, char** argv) {
 	if (argv[1] != nullptr) {
 		if (strcmp(argv[1], "build") == 0) {
@@ -29,7 +39,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 		string tmps;
-		switch (false) {
+		switch (true) {
 		case true:
 			while (getline(cin, tmps)) {
 				codes = tmps;
@@ -87,7 +97,12 @@ int main(int argc, char** argv) {
 					for (int i = 0; i < tokens.size(); i++) {
 						if (tokens[i].type == 3) {
 							concolor(BROWN, BLACK);
-							cout << "\"" << tokens[i].data << "\"";
+							string a = ReplaceAll(tokens[i].data, "\n", "(rep)");
+							a = ReplaceAll(a, "\\", "(rep2)");
+
+							a = ReplaceAll(a, "(rep)", "\\n");
+							a = ReplaceAll(a, "(rep2)", "\\\\");
+							cout << "\"" << a << "\"";
 						}
 						else if (tokens[i].type == 1) {
 							concolor(CYAN, BLACK);
