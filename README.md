@@ -18,9 +18,9 @@
 ## System Variable
 | Variable name | Value                     |
 |---------------|---------------------------|
-| scanInt       | input number(int) value   |
-| scanFloat     | input number(float) value |
-| scanLine      | input string              |
+| scanint       | input number(int) value   |
+| scanfloat     | input number(float) value |
+| scanline      | input string              |
 
 ## Operator
 
@@ -51,7 +51,7 @@ print("Hello, World!");
 ```
 **A+B**
 ```
-$new:$a = scanInt;
-$new:$b = scanInt;
+$new:$a = scanint;
+$new:$b = scanint;
 print(a + b);
 ```
