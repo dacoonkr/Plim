@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 		string tmps;
-		switch (true) {
+		switch (false) {
 		case true:
 			while (getline(cin, tmps)) {
 				codes = tmps;
@@ -106,6 +106,10 @@ int main(int argc, char** argv) {
 						}
 						else if (tokens[i].type == 1) {
 							concolor(CYAN, BLACK);
+							cout << "" << tokens[i].data << "";
+						}
+						else if (tokens[i].type == 6) {
+							concolor(LIGHTMAGENTA, BLACK);
 							cout << "" << tokens[i].data << "";
 						}
 						else if (tokens[i].type == 2) {

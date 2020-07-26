@@ -7,7 +7,7 @@
 #include "syntax_checker.h"
 using namespace std;
 
-char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':',';','\n' };
+char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':',';','\n','}','{' };
 
 int splitTK(bool showError, string code, vector<Data>* tokens);
 
@@ -81,6 +81,21 @@ int splitTK(bool showError, string code, vector<Data>* tokens) {
 					now = "";
 					tokens->push_back(tmp);
 				}
+
+				if (code[i] == '{') {
+					Data tmp;
+					tmp.data = "{";
+					tmp.type = 6;
+					tokens->push_back(tmp);
+					continue;
+				}
+				if (code[i] == '}') {
+					Data tmp;
+					tmp.data = "}";
+					tmp.type = 6;
+					tokens->push_back(tmp);
+					continue;
+				}
 				Data tmp;
 				tmp.data = code[i];
 				tmp.type = 0;
@@ -139,6 +154,25 @@ void postfix(vector<Data>* tokens, vector<Data> *postfixed) {
 				}
 				keyWordStack.push(",");
 				continue;
+			}
+			else if (tokens->at(i).data == "{") {
+				Data tmp;
+				tmp.data = "{";
+				tmp.type = 6;
+				postfixed->push_back(tmp);
+			}
+			else if (tokens->at(i).data == "}") {
+				while (!keyWordStack.empty()) {
+					Data tmp;
+					tmp.data = keyWordStack.top();
+					tmp.type = 0;
+					postfixed->push_back(tmp);
+					keyWordStack.pop();
+				}
+				Data tmp;
+				tmp.data = "}";
+				tmp.type = 6;
+				postfixed->push_back(tmp);
 			}
 			else if (tokens->at(i).data == ";") {
 				while (!keyWordStack.empty()) {

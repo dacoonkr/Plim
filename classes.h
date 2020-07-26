@@ -5,7 +5,7 @@ using namespace std;
 
 class Data {
 public:
-	int type = 1; // 0:Keyword  1:Function  2:Variable  3:String  4:Number  5:ParamCnt
+	int type = 1; // 0:Keyword  1:Function  2:Variable  3:String  4:Number  5:ParamCnt  6:Brace
 	string data;
 
 	int get_type() {
