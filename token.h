@@ -48,7 +48,7 @@ int splitTK(bool showError, string code, vector<Data>* tokens) {
 				}
 			}
 			if (isKeyWord) {
-				if (now == "\n") continue;
+				if (code[i] == '\n') continue;
 				if (now != "") {
 					Data tmp;
 					if (now[0] == '\"') {
