@@ -21,3 +21,9 @@ public:
 	int type = 1; // 1:String  2:Number
 	string data;
 };
+
+class BlockHead {
+public:
+	string headtype;
+	int returnPoint;
+};

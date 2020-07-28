@@ -9,6 +9,8 @@ using namespace std;
 #define pl_1003 "실수 값이 입력되지 않았습니다."
 #define pl_1004 "함수를 찾을 수 없습니다."
 #define pl_1005 "변수를 찾을 수 없습니다."
+#define pl_1006 "if와 짝을 이루는 {}가 없습니다."
+#define pl_1007 "for과 짝을 이루는 {}가 없습니다."
 
 #define sy_1000 "괄호 짝을 찾을 수 없습니다."
 #define sy_1001 "닫히지 않은 괄호가 남아있습니다."

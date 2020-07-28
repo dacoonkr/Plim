@@ -33,6 +33,7 @@
 | 3        | a + b    | a plus b             |
 | 3        | a - b    | a minus b            |
 | 4        | $a = b   | assign a to b        |
+| 4        | a == b   | compare a to b       |
 | 4        | $new:$a  | definition variable a|
 
 ## Basic Function
@@ -42,6 +43,14 @@
 | print(anytype content)     | print content on console  |
 | exit(number n)             | exit with code n          |
 | system(string command)     | execute command           |
+
+## Block
+
+| Syntax                           | Action                                           |
+|----------------------------------|--------------------------------------------------|
+| if ( expression ) { code }       | if expression is true, run code                  |
+| for ( $var_name, st, en )        | set var_name from st to en - 1 and each run code |
+
 
 ## Examples
 

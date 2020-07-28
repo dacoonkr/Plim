@@ -46,8 +46,8 @@ int main(int argc, char** argv) {
 				if (tmps.length() > 0) if (tmps[tmps.length() - 1] != ';') {
 					while (1) {
 						string tmps;
-						cout << "  > ", getline(cin, tmps);
-						codes += ";";
+						getline(cin, tmps);
+						codes += ";\n";
 						codes += tmps;
 						if (tmps.length() > 0) { if (tmps[tmps.length() - 1] == ';') break; }
 					}

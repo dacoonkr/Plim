@@ -96,6 +96,14 @@ int splitTK(bool showError, string code, vector<Data>* tokens) {
 					tokens->push_back(tmp);
 					continue;
 				}
+				if (code[i] == '=' && code[i + 1] == '=') {
+					Data tmp;
+					tmp.data = "==";
+					tmp.type = 0;
+					tokens->push_back(tmp);
+					i++;
+					continue;
+				}
 				Data tmp;
 				tmp.data = code[i];
 				tmp.type = 0;

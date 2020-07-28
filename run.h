@@ -17,11 +17,31 @@ int isKeyVariable(string a) {
 }
 
 void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* runtimeVariable) {
+	stack<BlockHead> BlockHeader;
 	for (size_t i = 0; i < postfixed->size(); i++) {
 		if (postfixed->at(i).type == 3 || postfixed->at(i).type == 4) {
 			runtime->push(postfixed->at(i));
+			continue;
 		}
 		else if (postfixed->at(i).type == 0 && postfixed->at(i).data == "\n") {
+			continue;
+		}
+		else if (postfixed->at(i).type == 6 && postfixed->at(i).data == "{") {
+			int braceCnt = 1;
+			while (braceCnt > 0) {
+				i++;
+				if (postfixed->at(i).type == 6 && postfixed->at(i).data == "{") braceCnt++;
+				if (postfixed->at(i).type == 6 && postfixed->at(i).data == "}") braceCnt--;
+			}
+			continue;
+		}
+		else if (postfixed->at(i).type == 6 && postfixed->at(i).data == "}") {
+			if (BlockHeader.top().headtype == "if");
+			else if (BlockHeader.top().headtype == "for") {
+				i = BlockHeader.top().returnPoint;
+			}
+
+			BlockHeader.pop();
 			continue;
 		}
 		else if (postfixed->at(i).data[0] == ';') {
@@ -72,9 +92,7 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 			}
 		}
 		else if (postfixed->at(i).type == 2) {
-			Data tmp;
-			tmp.data = postfixed->at(i).data;
-			runtime->push(tmp);
+			runtime->push(postfixed->at(i));
 		}
 		else if (postfixed->at(i).type == 0) {
 			Data a = runtime->top(); runtime->pop();
@@ -82,8 +100,8 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 			swap(a, b);
 			Data tmp;
 			stringstream number_to_string;
-			switch (postfixed->at(i).data[0]) {
-			case '+':
+			string calc = postfixed->at(i).data;
+			if (calc == "+") {
 				if (a.type == 3 || b.type == 3) {
 					tmp.type = 3;
 					tmp.data = a.data + b.data;
@@ -97,45 +115,45 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 						tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 					runtime->push(tmp);
 				}
-				break;
-			case '-':
+			}
+			if (calc == "-") {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) - stod(b.data);
 				tmp.data = number_to_string.str();
 				while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime->push(tmp);
-				break;
-			case '*':
+			}
+			if (calc == "*") {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) * stod(b.data);
 				tmp.data = number_to_string.str();
 				while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime->push(tmp);
-				break;
-			case '/':
+			}
+			if (calc == "/") {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) / stod(b.data);
 				tmp.data = number_to_string.str();
 				while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime->push(tmp);
-				break;
-			case '%':
+			}
+			if (calc == "%") {
 				tmp.type = 4;
 				tmp.data = to_string(stoi(a.data) % stoi(b.data));
 				runtime->push(tmp);
-				break;
-			case '^':
+			}
+			if (calc == "^") {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << pow(stod(a.data), stod(b.data));
 				tmp.data = number_to_string.str();
 				while ((tmp.data[tmp.data.length() - 1] == '0' || tmp.data[tmp.data.length() - 1] == '.') && tmp.data.find('.') != tmp.data.npos)
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime->push(tmp);
-				break;
-			case ':':
+			}
+			if (calc == ":") {
 				if (a.data == "$new") {
 					Variable tmp2;
 					tmp2.data = "0";
@@ -145,8 +163,8 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					tmp.data = b.data;
 					runtime->push(tmp);
 				}
-				break;
-			case '=':
+			}
+			if (calc == "=") {
 				Variable tmp2;
 				tmp2.data = b.data;
 				tmp2.type = b.type - 2;
@@ -154,7 +172,12 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				tmp.type = b.type;
 				tmp.data = b.data;
 				runtime->push(tmp);
-				break;
+			}
+			if (calc == "==") {
+				Data tmp;
+				tmp.data = (a.data == b.data && a.type == b.type) ? "1" : "0";
+				tmp.type = 4;
+				runtime->push(tmp);
 			}
 		}
 		else if (postfixed->at(i).type == 1) {
@@ -179,11 +202,52 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 			else if (postfixed->at(i).data == "system") {
 				if (paramCnt != 1) error(postfixed->at(i).data, pl_1000);
 				if (parameter[0].type != 3) error(postfixed->at(i).data, pl_1001);
-				system(parameter[0].data.c_str());
+				std::system(parameter[0].data.c_str());
 			}
 			else if (postfixed->at(i).data == "print") {
 				for (size_t m = 0; m < parameter.size(); m++) {
 					cout << parameter[m].data;
+				}
+			}
+			else if (postfixed->at(i).data == "if") {
+				if (paramCnt != 1) error(postfixed->at(i).data, pl_1000);
+				if (parameter[0].type != 4) error(postfixed->at(i).data, pl_1001);
+				if (postfixed->at(i + 1).data != "{") error(postfixed->at(i).data, pl_1006);
+
+				if (parameter[0].data != "0") {
+					BlockHead tmp;
+					tmp.headtype = "if";
+					BlockHeader.push(tmp);
+					i++;
+				}
+			}
+			else if (postfixed->at(i).data == "for") {
+				if (paramCnt != 3) error(postfixed->at(i).data, pl_1000);
+				if (parameter[0].type != 2) error(postfixed->at(i).data, pl_1001);
+				if (parameter[1].type != 4) error(postfixed->at(i).data, pl_1001);
+				if (parameter[2].type != 4) error(postfixed->at(i).data, pl_1001);
+				if (postfixed->at(i + 1).data != "{") error(postfixed->at(i).data, pl_1007);
+
+				auto var = runtimeVariable->find(parameter[0].data.substr(1));
+
+				int stp = stoi(parameter[1].data), enp = stoi(parameter[2].data);
+				int nop = stoi(var->second.data);
+					
+				if (nop < stp) {
+					var->second.data = to_string(stp);
+					BlockHead tmp;
+					tmp.headtype = "for";
+					tmp.returnPoint = i - 5;
+					BlockHeader.push(tmp);
+					i++;
+				}
+				else if (nop < enp - 1) {
+					var->second.data = to_string(stoi(var->second.data) + 1);
+					BlockHead tmp;
+					tmp.headtype = "for";
+					tmp.returnPoint = i - 5;
+					i++;
+					BlockHeader.push(tmp);
 				}
 			}
 			else error(postfixed->at(i).data, pl_1004);
