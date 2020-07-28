@@ -116,7 +116,7 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					runtime->push(tmp);
 				}
 			}
-			if (calc == "-") {
+			else if (calc == "-") {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) - stod(b.data);
 				tmp.data = number_to_string.str();
@@ -124,7 +124,7 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime->push(tmp);
 			}
-			if (calc == "*") {
+			else if (calc == "*") {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) * stod(b.data);
 				tmp.data = number_to_string.str();
@@ -132,7 +132,7 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime->push(tmp);
 			}
-			if (calc == "/") {
+			else if (calc == "/") {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << stod(a.data) / stod(b.data);
 				tmp.data = number_to_string.str();
@@ -140,12 +140,12 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime->push(tmp);
 			}
-			if (calc == "%") {
+			else if (calc == "%") {
 				tmp.type = 4;
 				tmp.data = to_string(stoi(a.data) % stoi(b.data));
 				runtime->push(tmp);
 			}
-			if (calc == "^") {
+			else if (calc == "^") {
 				tmp.type = 4;
 				number_to_string << fixed << setprecision(15) << pow(stod(a.data), stod(b.data));
 				tmp.data = number_to_string.str();
@@ -153,7 +153,7 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					tmp.data = tmp.data.substr(0, tmp.data.length() - 1);
 				runtime->push(tmp);
 			}
-			if (calc == ":") {
+			else if (calc == ":") {
 				if (a.data == "$new") {
 					Variable tmp2;
 					tmp2.data = "0";
@@ -164,7 +164,7 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					runtime->push(tmp);
 				}
 			}
-			if (calc == "=") {
+			else if (calc == "=") {
 				Variable tmp2;
 				tmp2.data = b.data;
 				tmp2.type = b.type - 2;
@@ -173,9 +173,51 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				tmp.data = b.data;
 				runtime->push(tmp);
 			}
-			if (calc == "==") {
+			else if (calc == "==") {
 				Data tmp;
 				tmp.data = (a.data == b.data && a.type == b.type) ? "1" : "0";
+				tmp.type = 4;
+				runtime->push(tmp);
+			}
+			else if (calc == ">") {
+				Data tmp;
+				tmp.data = (stod(a.data) > stod(b.data)) ? "1" : "0";
+				tmp.type = 4;
+				runtime->push(tmp);
+			}
+			else if (calc == "<") {
+				Data tmp;
+				tmp.data = (stod(a.data) < stod(b.data)) ? "1" : "0";
+				tmp.type = 4;
+				runtime->push(tmp);
+			}
+			else if (calc == ">=") {
+				Data tmp;
+				tmp.data = (stod(a.data) >= stod(b.data)) ? "1" : "0";
+				tmp.type = 4;
+				runtime->push(tmp);
+			}
+			else if (calc == "<=") {
+				Data tmp;
+				tmp.data = (stod(a.data) <= stod(b.data)) ? "1" : "0";
+				tmp.type = 4;
+				runtime->push(tmp);
+			}
+			else if (calc == "!=") {
+				Data tmp;
+				tmp.data = (a.data == b.data && a.type == b.type) ? "0" : "1";
+				tmp.type = 4;
+				runtime->push(tmp);
+			}
+			else if (calc == "&&") {
+				Data tmp;
+				tmp.data = (a.data == "1" && b.data == "1") ? "1" : "0";
+				tmp.type = 4;
+				runtime->push(tmp);
+			}
+			else if (calc == "||") {
+				Data tmp;
+				tmp.data = (a.data == "1" || b.data == "1") ? "1" : "0";
 				tmp.type = 4;
 				runtime->push(tmp);
 			}
@@ -208,6 +250,15 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				for (size_t m = 0; m < parameter.size(); m++) {
 					cout << parameter[m].data;
 				}
+			}
+			else if (postfixed->at(i).data == "!") {
+				if (paramCnt != 1) error(postfixed->at(i).data, pl_1000);
+				if (parameter[0].type != 4) error(postfixed->at(i).data, pl_1001);
+
+				Data tmp;
+				tmp.type = parameter[0].type;
+				tmp.data = to_string(1 - stoi(parameter[0].data));
+				runtime->push(tmp);
 			}
 			else if (postfixed->at(i).data == "if") {
 				if (paramCnt != 1) error(postfixed->at(i).data, pl_1000);

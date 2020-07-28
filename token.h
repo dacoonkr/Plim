@@ -7,7 +7,7 @@
 #include "syntax_checker.h"
 using namespace std;
 
-char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':',';','\n','}','{' };
+char keyWords[] = { '(',')',',','+','-','/','*','=','%','^',':',';','\n','}','{','|','&','!','<','>' };
 
 int splitTK(bool showError, string code, vector<Data>* tokens);
 
@@ -89,16 +89,63 @@ int splitTK(bool showError, string code, vector<Data>* tokens) {
 					tokens->push_back(tmp);
 					continue;
 				}
-				if (code[i] == '}') {
+				else if (code[i] == '}') {
 					Data tmp;
 					tmp.data = "}";
 					tmp.type = 6;
 					tokens->push_back(tmp);
 					continue;
 				}
-				if (code[i] == '=' && code[i + 1] == '=') {
+				else if (code[i] == '=' && code[i + 1] == '=') {
 					Data tmp;
 					tmp.data = "==";
+					tmp.type = 0;
+					tokens->push_back(tmp);
+					i++;
+					continue;
+				}
+				else if (code[i] == '!' && code[i + 1] == '=') {
+					Data tmp;
+					tmp.data = "!=";
+					tmp.type = 0;
+					tokens->push_back(tmp);
+					i++;
+					continue;
+				}
+				else if (code[i] == '!' && code[i + 1] == '(') {
+					Data tmp;
+					tmp.data = "!";
+					tmp.type = 1;
+					tokens->push_back(tmp);
+					continue;
+				}
+				else if (code[i] == '<' && code[i + 1] == '=') {
+					Data tmp;
+					tmp.data = "<=";
+					tmp.type = 0;
+					tokens->push_back(tmp);
+					i++;
+					continue;
+				}
+				else if (code[i] == '>' && code[i + 1] == '=') {
+					Data tmp;
+					tmp.data = ">=";
+					tmp.type = 0;
+					tokens->push_back(tmp);
+					i++;
+					continue;
+				}
+				else if (code[i] == '&' && code[i + 1] == '&') {
+					Data tmp;
+					tmp.data = "&&";
+					tmp.type = 0;
+					tokens->push_back(tmp);
+					i++;
+					continue;
+				}
+				else if (code[i] == '|' && code[i + 1] == '|') {
+					Data tmp;
+					tmp.data = "||";
 					tmp.type = 0;
 					tokens->push_back(tmp);
 					i++;

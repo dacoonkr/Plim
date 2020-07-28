@@ -1,6 +1,6 @@
 # Plim
 
-## Build & Run
+## 빌드와 실행
 
 > 코드 실행: `plim foo.plim`
 
@@ -8,51 +8,59 @@
 
 > 실행 파일 실행: `plim run foo.plm`
 
-## Type
-| TypeName | Range                    |
+## 타입
+
+| 타입 이름 | 범위                     |
 |----------|--------------------------|
-| number   | -2147483648 ~ 2147483647 |
-| number   | 8byte floating point     |
-| string   | no limit                 |
+| number   | 8바이트 부동소수점         |
+| string   | 제한 없음                 |
 
-## System Variable
-| Variable name | Value                     |
+## 예약어
+
+| 예약어 이름    | 설명                      |
 |---------------|---------------------------|
-| scanint       | input number(int) value   |
-| scanfloat     | input number(float) value |
-| scanline      | input string              |
+| scanint       | 정수 값을 입력             |
+| scanfloat     | 실수 값을 입력             |
+| scanline      | 문자열 한 줄을 입력        |
 
-## Operator
+## 연산자
 
-| Priority | Operator | Action               |
+| 우선순위  | 문법     | 설명                  |
 |----------|----------|----------------------|
-| 1        | a ^ b    | a to the power of b  |
-| 2        | a * b    | a multi b            |
-| 2        | a / b    | a division b         |
-| 2        | a % b    | a mod b              |
-| 3        | a + b    | a plus b             |
-| 3        | a - b    | a minus b            |
-| 4        | $a = b   | assign a to b        |
-| 4        | a == b   | compare a to b       |
-| 4        | $new:$a  | definition variable a|
+| 1        | a ^ b    | a의 b제곱             |
+| 2        | a * b    | a 곱하기 b            |
+| 2        | a / b    | a 나누기 b            |
+| 2        | a % b    | a 나누기 b 의 나머지   |
+| 3        | a + b    | a 더하기 b            |
+| 3        | a - b    | a 빼기 b              |
+| 4        | $a = b   | 변수 a에 b의 값 대입   |
+| 4        | a == b   | a와 b가 같은지 비교    |
+| 4        | a != b   | a와 b가 다른지 비교    |
+| 4        | a < b    | b가 a보다 큰 지 비교   |
+| 4        | a > b    | a가 b보다 큰 지 비교   |
+| 4        | a <= b   | b가 a보다 크거나 같은지 비교   |
+| 4        | a >= b   | a가 b보다 크거나 같은지 비교   |
+| 4        | $new:$a  | 새로운 a변수 생성      |
+| 5        | a && b   | a와 b가 둘 다 참인지 확인   |
+| 5        | a || b   | a와 b중 하나라도 참인지 확인   |
 
-## Basic Function
+## 기본 함수
 
-| Definition                 | Action                    |
+| 사용법                      | 설명                      |
 |----------------------------|---------------------------|
-| print(anytype content)     | print content on console  |
-| exit(number n)             | exit with code n          |
-| system(string command)     | execute command           |
+| print(anytype content)     | 콘솔에 content를 출력      |
+| exit(number n)             | n코드로 종료               |
+| system(string command)     | command를 실행 (CMD)      |
 
-## Block
+## 블럭
 
-| Syntax                           | Action                                           |
+| 문법                             | 설명                                           |
 |----------------------------------|--------------------------------------------------|
-| if ( expression ) { code }       | if expression is true, run code                  |
-| for ( $var_name, st, en )        | set var_name from st to en - 1 and each run code |
+| if ( expression ) { code }       | 만약 expression이 참이면 code실행                  |
+| for ( $var_name, st, en ) { code } | var_name을 st부터 en-1까지 각각 다 넣어 보며 코드 실행 |
 
 
-## Examples
+## 예제
 
 **Hello World**
 ```
@@ -63,4 +71,21 @@ print("Hello, World!");
 $new:$a = scanint;
 $new:$b = scanint;
 print(a + b);
+```
+**1부터 100까지의 소수**
+```
+$new:$a=0-1;
+$new:$b
+$new:$c
+print("2 ")
+for($a, 2, 100){
+    $c=1
+    $b=0-1
+    for($b,2,a) {
+        if(a%b==0) {
+            $c=0
+        }
+    }
+    if(c==1){ print(a," ") }
+}
 ```
