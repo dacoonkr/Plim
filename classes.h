@@ -19,6 +19,7 @@ public:
 class Variable {
 public:
 	int type = 1; // 1:String  2:Number
+	bool isConst = false;
 	string data;
 };
 

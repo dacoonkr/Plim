@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 	}
 	else {
 		string tmps;
-		switch (false) {
+		switch (true) {
 		case true:
 			while (getline(cin, tmps)) {
 				codes = tmps;

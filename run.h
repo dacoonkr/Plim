@@ -9,10 +9,16 @@
 using namespace std;
 
 int isKeyVariable(string a) {
-	if (a == "$new") return 1;
+	if (a == "new") return 1;
+	if (a == "const") return 1;
 	if (a == "scanint") return 1;
 	if (a == "scanfloat") return 1;
 	if (a == "scanline") return 1;
+	return 0;
+}
+int isKeyWord(string a) {
+	if (a == "new") return 1;
+	if (a == "const") return 1;
 	return 0;
 }
 
@@ -38,6 +44,9 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 		else if (postfixed->at(i).type == 6 && postfixed->at(i).data == "}") {
 			if (BlockHeader.top().headtype == "if");
 			else if (BlockHeader.top().headtype == "for") {
+				i = BlockHeader.top().returnPoint;
+			}
+			else if (BlockHeader.top().headtype == "while") {
 				i = BlockHeader.top().returnPoint;
 			}
 
@@ -79,6 +88,12 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				}
 				else error(postfixed->at(i).data, pl_1003);
 			}
+			else if (isKeyWord(postfixed->at(i).data)) {
+				Data tmp;
+				tmp.data = postfixed->at(i).data;
+				tmp.type = 2;
+				runtime->push(tmp);
+			}
 			else {
 				if (runtimeVariable->find(postfixed->at(i).get_data()) == runtimeVariable->end()) {
 					error(postfixed->at(i).get_data(), pl_1005);
@@ -92,6 +107,11 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 			}
 		}
 		else if (postfixed->at(i).type == 2) {
+			auto tmp = runtimeVariable->find(postfixed->at(i).get_data().substr(1));
+			if (isKeyVariable(postfixed->at(i).get_data()));
+			else if (tmp != runtimeVariable->end()) {
+				if (tmp->second.isConst) error('$' + tmp->first, pl_1008);
+			}
 			runtime->push(postfixed->at(i));
 		}
 		else if (postfixed->at(i).type == 0) {
@@ -154,10 +174,20 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				runtime->push(tmp);
 			}
 			else if (calc == ":") {
-				if (a.data == "$new") {
+				if (a.data == "new") {
 					Variable tmp2;
 					tmp2.data = "0";
 					tmp2.type = 2;
+					runtimeVariable->insert(make_pair(b.data.substr(1), tmp2));
+					tmp.type = 2;
+					tmp.data = b.data;
+					runtime->push(tmp);
+				}
+				else if (a.data == "const") {
+					Variable tmp2;
+					tmp2.data = "0";
+					tmp2.type = 2;
+					tmp2.isConst = true;
 					runtimeVariable->insert(make_pair(b.data.substr(1), tmp2));
 					tmp.type = 2;
 					tmp.data = b.data;
@@ -268,6 +298,19 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				if (parameter[0].data != "0") {
 					BlockHead tmp;
 					tmp.headtype = "if";
+					BlockHeader.push(tmp);
+					i++;
+				}
+			}
+			else if (postfixed->at(i).data == "while") {
+				if (paramCnt != 1) error(postfixed->at(i).data, pl_1000);
+				if (parameter[0].type != 4) error(postfixed->at(i).data, pl_1001);
+				if (postfixed->at(i + 1).data != "{") error(postfixed->at(i).data, pl_1006);
+
+				if (parameter[0].data != "0") {
+					BlockHead tmp;
+					tmp.headtype = "while";
+					tmp.returnPoint = i - 3;
 					BlockHeader.push(tmp);
 					i++;
 				}
