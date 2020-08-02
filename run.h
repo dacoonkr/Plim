@@ -11,6 +11,8 @@ using namespace std;
 int isKeyVariable(string a) {
 	if (a == "new") return 1;
 	if (a == "const") return 1;
+	if (a == "arr") return 1;
+	if (a == "del") return 1;
 	if (a == "scanint") return 1;
 	if (a == "scanfloat") return 1;
 	if (a == "scanline") return 1;
@@ -19,10 +21,12 @@ int isKeyVariable(string a) {
 int isKeyWord(string a) {
 	if (a == "new") return 1;
 	if (a == "const") return 1;
+	if (a == "arr") return 1;
+	if (a == "del") return 1;
 	return 0;
 }
 
-void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* runtimeVariable) {
+void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Pointer>* runtimeVariable, vector<Variable>* runtimeMemory) {
 	stack<BlockHead> BlockHeader;
 	for (size_t i = 0; i < postfixed->size(); i++) {
 		if (postfixed->at(i).type == 3 || postfixed->at(i).type == 4) {
@@ -100,8 +104,8 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				}
 				else {
 					Data tmp;
-					tmp.data = runtimeVariable->find(postfixed->at(i).data)->second.data;
-					tmp.type = runtimeVariable->find(postfixed->at(i).data)->second.type + 2;
+					tmp.data = runtimeMemory->at(runtimeVariable->find(postfixed->at(i).data)->second.pointer).data;
+					tmp.type = runtimeMemory->at(runtimeVariable->find(postfixed->at(i).data)->second.pointer).type + 2;
 					runtime->push(tmp);
 				}
 			}
@@ -110,7 +114,7 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 			auto tmp = runtimeVariable->find(postfixed->at(i).get_data().substr(1));
 			if (isKeyVariable(postfixed->at(i).get_data()));
 			else if (tmp != runtimeVariable->end()) {
-				if (tmp->second.isConst) error('$' + tmp->first, pl_1008);
+				if (runtimeMemory->at(tmp->second.pointer).isConst) error('$' + tmp->first, pl_1008);
 			}
 			runtime->push(postfixed->at(i));
 		}
@@ -175,30 +179,41 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 			}
 			else if (calc == ":") {
 				if (a.data == "new") {
-					Variable tmp2;
-					tmp2.data = "0";
-					tmp2.type = 2;
+					Pointer tmp2;
+					tmp2.pointer = runtimeMemory->size();
 					runtimeVariable->insert(make_pair(b.data.substr(1), tmp2));
-					tmp.type = 2;
-					tmp.data = b.data;
-					runtime->push(tmp);
+					Variable tmp3;
+					tmp3.data = "0";
+					tmp3.type = 2;
+					runtimeMemory->push_back(tmp3);
+					runtime->push(b);
+				}
+				else if (a.data == "arr") {
+					Pointer tmp2;
+					tmp2.pointer = runtimeMemory->size();
+					runtimeVariable->insert(make_pair(b.data.substr(1), tmp2));
+					runtime->push(b);
 				}
 				else if (a.data == "const") {
-					Variable tmp2;
-					tmp2.data = "0";
-					tmp2.type = 2;
-					tmp2.isConst = true;
+					Pointer tmp2;
+					tmp2.pointer = runtimeMemory->size();
 					runtimeVariable->insert(make_pair(b.data.substr(1), tmp2));
-					tmp.type = 2;
-					tmp.data = b.data;
-					runtime->push(tmp);
+					Variable tmp3;
+					tmp3.data = "0";
+					tmp3.type = 2;
+					tmp3.isConst = true;
+					runtimeMemory->push_back(tmp3);
+					runtime->push(b);
+				}
+				else if (a.data == "del") {
+					runtimeVariable->erase(runtimeVariable->find(b.data.substr(1)));
 				}
 			}
 			else if (calc == "=") {
 				Variable tmp2;
 				tmp2.data = b.data;
 				tmp2.type = b.type - 2;
-				runtimeVariable->find(a.data.substr(1))->second = tmp2;
+				runtimeMemory->at(runtimeVariable->find(a.data.substr(1))->second.pointer) = tmp2;
 				tmp.type = b.type;
 				tmp.data = b.data;
 				runtime->push(tmp);
@@ -281,6 +296,14 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					cout << parameter[m].data;
 				}
 			}
+			else if (postfixed->at(i).data == "#") {
+				for (size_t m = 0; m < parameter.size(); m++) {
+					Variable tmp;
+					tmp.data = parameter[m].data;
+					tmp.type = parameter[m].type - 2;
+					runtimeMemory->push_back(tmp);
+				}
+			}
 			else if (postfixed->at(i).data == "!") {
 				if (paramCnt != 1) error(postfixed->at(i).data, pl_1000);
 				if (parameter[0].type != 4) error(postfixed->at(i).data, pl_1001);
@@ -325,10 +348,10 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 				auto var = runtimeVariable->find(parameter[0].data.substr(1));
 
 				int stp = stoi(parameter[1].data), enp = stoi(parameter[2].data);
-				int nop = stoi(var->second.data);
-					
+				int nop = stoi(runtimeMemory->at(var->second.pointer).data);
+
 				if (nop < stp) {
-					var->second.data = to_string(stp);
+					runtimeMemory->at(var->second.pointer).data = to_string(stp);
 					BlockHead tmp;
 					tmp.headtype = "for";
 					tmp.returnPoint = i - 5;
@@ -336,7 +359,7 @@ void run(stack<Data>* runtime, vector<Data>* postfixed, map<string, Variable>* r
 					i++;
 				}
 				else if (nop < enp - 1) {
-					var->second.data = to_string(stoi(var->second.data) + 1);
+					runtimeMemory->at(var->second.pointer).data = to_string(stoi(runtimeMemory->at(var->second.pointer).data) + 1);
 					BlockHead tmp;
 					tmp.headtype = "for";
 					tmp.returnPoint = i - 5;

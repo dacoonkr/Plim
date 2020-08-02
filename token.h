@@ -170,7 +170,7 @@ int splitTK(bool showError, string code, vector<Data>* tokens) {
 		else if ('-' == now[0] || ('0' <= now[0] && now[0] <= '9')) {
 			bool isnumber = true;
 			for (int j = 0; j < now.length(); j++) {
-				if (!('0' <= now[j] && now[j] <= '9')) {
+				if (!(('0' <= now[j] && now[j] <= '9') || now[j] == '.')) {
 					isnumber = false;
 					break;
 				}

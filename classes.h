@@ -23,6 +23,11 @@ public:
 	string data;
 };
 
+class Pointer {
+public:
+	int pointer = 0;
+};
+
 class BlockHead {
 public:
 	string headtype;

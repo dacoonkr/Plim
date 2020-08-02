@@ -22,9 +22,10 @@ string types[6] = { "Keyword : ", "Function: ", "Variable: ", "String  : ", "Num
 
 vector<Data> tokens;
 vector<Data> postfixed;
-
 stack<Data> runtime;
-map<string, Variable> runtimeVariable;
+
+map<string, Pointer> runtimeVariable;
+vector<Variable> runtimeMemory;
 
 string code;
 
@@ -38,7 +39,7 @@ void compile_and_run(string codes) {
 	compile(code, &postfixed, &tokens, output);
 	plmLoad(&postfixed, output);
 
-	run(&runtime, &postfixed, &runtimeVariable);
+	run(&runtime, &postfixed, &runtimeVariable, &runtimeMemory);
 	cout << '\n';
 
 	tokens.clear();
@@ -70,7 +71,7 @@ void run_(string output) {
 	start = clock();
 
 	plmLoad(&postfixed, output);
-	run(&runtime, &postfixed, &runtimeVariable);
+	run(&runtime, &postfixed, &runtimeVariable, &runtimeMemory);
 	cout << '\n';
 	tokens.clear();
 	postfixed.clear();
