@@ -70,8 +70,8 @@ print("Hello, World!");
 ```
 **A+B**
 ```
-$new:$a = scanint;
-$new:$b = scanint;
+new:$a = scanint;
+new:$b = scanint;
 print(a + b);
 ```
 **1부터 100까지의 소수**
