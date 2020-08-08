@@ -1,10 +1,13 @@
 #include <string>
+#include <map>
 #include "classes.hpp"
 #include "tokens.hpp"
 #include "parsetree.hpp"
 #include "postfix.hpp"
+#include "run.hpp"
 
 std::vector<pl::RtData> CpTokens;
+std::map<std::string, pl::RtVar> RtVars;
 pl::ParseTree CpParsedTree;
 
 namespace pl {
@@ -17,5 +20,7 @@ namespace pl {
 		pl::CpParseTree(CpTokens, CpParsedTree);
 
 		pl::CpPostFix(CpParsedTree.children);
+
+		pl::RtExecute(CpParsedTree.children, RtVars);
 	}
 }

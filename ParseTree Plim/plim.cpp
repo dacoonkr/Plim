@@ -8,10 +8,10 @@
 auto main() -> int {
 	FAST_IO;
 
-	std::cout << "Plim Interpreter\n";
+	std::cout << "Plim(PT-1) Interpreter";
 	while (1) {
 		std::string this_line;
-		std::cout << ">>> ";
+		std::cout << "\n>>> ";
 		std::getline(std::cin, this_line);
 
 		pl::plim_run(this_line);

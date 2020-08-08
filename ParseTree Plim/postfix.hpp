@@ -16,13 +16,13 @@ namespace pl {
 	}
 
 	auto CpPostFix(std::vector<pl::ParseTree>& parsedTree) -> void {
-		for (int pst = 0; pst < parsedTree.size(); pst++) {
+		for (size_t pst = 0; pst < parsedTree.size(); pst++) {
 			auto& nowline = parsedTree[pst];
 			std::vector<pl::RtData> CpPostfixing;
 			std::stack<std::string> CpOperator;
 			std::stack<size_t> CpBrace;
 
-			for (int i = 0; i < nowline.codes.size(); i++) {
+			for (size_t i = 0; i < nowline.codes.size(); i++) {
 				auto& now = nowline.codes[i];
 
 				if (now.type == 1) {
