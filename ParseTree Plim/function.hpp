@@ -11,16 +11,19 @@ namespace pl {
 			RtStk.pop();
 		}
 		std::reverse(FcRtParams.begin(), FcRtParams.end());
-		
-		if (func == "nothing") {
-			RtVar tmp(FcRtParams[0]);
-			RtStk.push(tmp);
-			return;
-		}
+
 		if (func == "print") {
 			for (int i = 0; i < FcRtParams.size(); i++) {
 				std::cout << FcRtParams[i].data;
 			}
+			return;
+		}
+		if (func == "make_array") {
+			RtVar tmp(4, "");
+			for (int i = 0; i < FcRtParams.size(); i++) {
+				tmp.children.push_back(FcRtParams[i]);
+			}
+			RtStk.push(tmp);
 			return;
 		}
 	}

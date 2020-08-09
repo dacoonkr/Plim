@@ -35,9 +35,20 @@ namespace pl {
 					else if (now.data == ";") {
 						CpClearOpratorStack(CpPostfixing, CpOperator);
 					}
+					else if (now.data == "(") {
+						CpOperator.push("(");
+						CpBrace.push(-1);
+					}
 					else if (now.data == ")") {
 						size_t paramCnt = CpBrace.top();
 						CpBrace.pop();
+
+						if (paramCnt == -1) {
+							CpClearOpratorStack(CpPostfixing, CpOperator);
+							CpOperator.pop();
+							continue;
+						}
+
 						CpClearOpratorStack(CpPostfixing, CpOperator);
 
 						CpPostfixing.push_back(RtData(5, std::to_string(paramCnt)));

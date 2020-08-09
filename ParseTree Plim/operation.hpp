@@ -70,5 +70,14 @@ namespace pl {
 			RtStk.push(tmp);
 			return;
 		}
+
+		if (oper == "->") {
+			RtVar tmp(fValue.children[stod(sValue.data)]);
+			RtStk.push(tmp);
+		}
+
+		if (oper == "=") {
+			RtVars.insert(make_pair(fValue.data, sValue));
+		}
 	}
 }

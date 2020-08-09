@@ -6,7 +6,7 @@
 namespace pl {
 	class RtVar {
 	public:
-		int type = 0; // int: 1  float: 2  string: 3
+		int type = 0; // int: 1  float: 2  string: 3  array: 4  keyword: 5
 		std::string data;
 
 		std::vector<pl::RtVar> children;

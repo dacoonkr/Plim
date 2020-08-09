@@ -4,7 +4,8 @@
 #include <string>
 #include "classes.hpp"
 
-char operators[] = { '(', ')', '+', '-', '*', '/', '^', ';', ',' };
+char operators[] = { '(', ')', '+', '-', '*', '/', '^', ';', ',', '=' };
+std::string multiOperators[] = { "->" };
 
 namespace pl {
 	auto CpLastComplete(std::string CpNow, std::vector<pl::RtData>& CpTokens) -> void {
@@ -55,6 +56,7 @@ namespace pl {
 				}
 				continue;
 			}
+			if (this_line[i] == ' ' || this_line[i] == '\n') continue;
 			else {
 				bool isOperator = false;
 				for (auto& j : operators) {
@@ -64,6 +66,22 @@ namespace pl {
 					}
 				}
 				if (isOperator) {
+					bool isMultiOperator = false;
+					if (i != this_line.size() - 1) {
+						for (auto& j : multiOperators) {
+							if (this_line.substr(i, 2) == j) {
+								if (CpNow.size() > 0) {
+									pl::CpLastComplete(CpNow, CpTokens);
+								}
+								CpTokens.push_back(pl::RtData(1, j));
+								i++;
+								CpNow.clear();
+								isMultiOperator = true;
+								break;
+							}
+						}
+					}
+					if (isMultiOperator) continue;
 					if (CpNow.size() > 0) {
 						if (this_line[i] == '(')
 							CpTokens.push_back(pl::RtData(4, CpNow));
