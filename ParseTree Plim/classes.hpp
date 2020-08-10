@@ -15,6 +15,10 @@ namespace pl {
 			type = pr_type;
 			data = pr_data;
 		}
+
+		RtVar () {
+			type = 0;
+		}
 	};
 
 	class RtData {

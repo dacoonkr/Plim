@@ -74,10 +74,17 @@ namespace pl {
 		if (oper == "->") {
 			RtVar tmp(fValue.children[stod(sValue.data)]);
 			RtStk.push(tmp);
+			return;
 		}
 
 		if (oper == "=") {
-			RtVars.insert(make_pair(fValue.data, sValue));
+			if (fValue.data.rfind("alloc", 0) == 0) {
+				RtVars.insert(make_pair(fValue.data.substr(5), sValue));
+			}
+			if (fValue.data.rfind("use", 0) == 0) {
+				RtVars[fValue.data.substr(3)] = sValue;
+			}
+			return;
 		}
 	}
 }

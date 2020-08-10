@@ -31,8 +31,12 @@ namespace pl {
 					continue;
 				}
 				else if (now.type == 2) { // variable
+					if (now.data.rfind("alloc", 0) == 0) {
+						RtStk.push(RtVar(5, now.data));
+						continue;
+					}
 					if (now.data.rfind("use", 0) == 0) {
-						RtStk.push(RtVar(5, now.data.substr(3)));
+						RtStk.push(RtVar(5, now.data));
 						continue;
 					}
 					RtStk.push(RtVars.find(now.data)->second);

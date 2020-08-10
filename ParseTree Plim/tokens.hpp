@@ -4,7 +4,7 @@
 #include <string>
 #include "classes.hpp"
 
-char operators[] = { '(', ')', '+', '-', '*', '/', '^', ';', ',', '=' };
+char operators[] = { '(', ')', '+', '-', '*', '/', '^', ';', ',', '=', ':' };
 std::string multiOperators[] = { "->" };
 
 namespace pl {
@@ -86,6 +86,10 @@ namespace pl {
 						if (this_line[i] == '(')
 							CpTokens.push_back(pl::RtData(4, CpNow));
 						else pl::CpLastComplete(CpNow, CpTokens);
+					}
+					if (this_line[i] == ':') {
+						CpNow += ':';
+						continue;
 					}
 					std::string tmp;
 					tmp += this_line[i];
