@@ -70,7 +70,7 @@ namespace pl {
 						continue;
 					}
 				}
-				else  if (now.type == 4) {
+				else if (now.type == 4) {
 					CpOperator.push(now.data);
 					CpOperator.push("(");
 					CpBrace.push(1);
