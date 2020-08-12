@@ -10,13 +10,14 @@ namespace pl {
 		std::string data;
 
 		std::vector<pl::RtVar> children;
+		std::map<std::string, pl::RtVar> member;
 
 		RtVar(int pr_type, std::string pr_data) {
 			type = pr_type;
 			data = pr_data;
 		}
 
-		RtVar () {
+		RtVar() {
 			type = 0;
 		}
 	};

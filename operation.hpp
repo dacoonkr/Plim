@@ -72,8 +72,14 @@ namespace pl {
 		}
 
 		if (oper == "->") {
-			RtVar tmp(fValue.children[stod(sValue.data)]);
-			RtStk.push(tmp);
+			if (fValue.data.rfind("use", 0) == 0) {
+				RtVar tmp(5, fValue.data + ':' + sValue.data);
+				RtStk.push(tmp);
+			}
+			else {
+				RtVar tmp(fValue.children[stod(sValue.data)]);
+				RtStk.push(tmp);
+			}
 			return;
 		}
 
@@ -82,7 +88,33 @@ namespace pl {
 				RtVars.insert(make_pair(fValue.data.substr(5), sValue));
 			}
 			if (fValue.data.rfind("use", 0) == 0) {
-				RtVars[fValue.data.substr(3)] = sValue;
+				if (fValue.data.find(':') != fValue.data.npos) {
+					RtVar* finded = nullptr;
+					bool isFirst = true;
+					std::string RtNow;
+					for (int i = 3; i < fValue.data.length(); i++) {
+						if (fValue.data[i] == ':') {
+							if (isFirst) {
+								isFirst = false;
+								finded = &RtVars[RtNow];
+							}
+							else {
+								if ('0' <= RtNow[0] && RtNow[0] <= '9')
+									finded = &(finded->children[stod(RtNow)]);
+								else finded = &(finded->member[RtNow]);
+							}
+							RtNow.clear();
+						}
+						else RtNow += fValue.data[i];
+					}
+					if (!RtNow.empty()) {
+						if ('0' <= RtNow[0] && RtNow[0] <= '9')
+							finded = &(finded->children[stod(RtNow)]);
+						else finded = &(finded->member[RtNow]);
+					}
+					*finded = sValue;
+				}
+				else RtVars[fValue.data.substr(3)] = sValue;
 			}
 			return;
 		}
