@@ -57,6 +57,10 @@ namespace pl {
 				}
 				continue;
 			}
+			if (isInStr) {
+				CpNow += this_line[i];
+				continue;
+			}
 			if (this_line[i] == ' ' || this_line[i] == '\n') continue;
 			else {
 				bool isOperator = false;

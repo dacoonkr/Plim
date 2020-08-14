@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include "memberPtr.hpp"
 
 namespace pl {
 	auto function(std::string func, std::stack<RtVar>& RtStk, int paramCnt, std::map<std::string, pl::RtVar>& RtVars) -> void {
@@ -37,40 +38,47 @@ namespace pl {
 				RtStk.push(tmp);
 				return;
 			}
+
+			/* Class Member Function */ {
+				if (func == ":size") {
+					auto& parent = RtStk.top();
+					if (parent.type == 4) {
+						RtStk.push(RtVar(1, std::to_string(parent.children.size())));
+						return;
+					}
+				}
+				if (func == ":resize") {
+					auto& parent = RtStk.top();
+					if (parent.type == 4) {
+						while (parent.children.size() > (size_t)stoi(FcRtParams[0].data)) parent.children.pop_back();
+						while (parent.children.size() < (size_t)stoi(FcRtParams[0].data)) parent.children.push_back(RtVar(1, "0"));
+						return;
+					}
+				}
+				if (func == ":print") {
+					auto& parent = RtStk.top();
+					if (parent.type == 4) {
+						std::cout << "[";
+						for (size_t i = 0; i < parent.children.size(); i++) {
+							std::cout << parent.children[i].data;
+							if (i != parent.children.size() - 1) std::cout << ", ";
+						}
+						std::cout << "]";
+						return;
+					}
+				}
+			}
 		}
 
-		/* Class Member Function */ {
-			if (func == ":size") {
-				auto& parent = RtStk.top();
-				if (parent.type == 4) {
-					RtStk.push(RtVar(1, std::to_string(parent.children.size())));
-					return;
-				}
-			}
-			if (func == ":resize") {
-				auto& parent = RtStk.top();
-				if (parent.type == 4) {
-					while (parent.children.size() > (size_t)stoi(FcRtParams[0].data)) parent.children.pop_back();
-					while (parent.children.size() < (size_t)stoi(FcRtParams[0].data)) parent.children.push_back(RtVar(1, "0"));
-					return;
-				}
-			}
-			if (func == ":print") {
-				auto& parent = RtStk.top();
-				if (parent.type == 4) {
-					std::cout << "[";
-					for (size_t i = 0; i < parent.children.size(); i++) {
-						std::cout << parent.children[i].data;
-						if (i != parent.children.size() - 1) std::cout << ", ";
-					}
-					std::cout << "]";
-					return;
-				}
-			}
 
-			if (func == ":append") {
-				auto& parent = RtStk.top();
-				return;
+		/* package Debug */ {
+			if (func == "addMember") {
+				auto* a = getPtr(FcRtParams[0].data, RtVars);
+				std::pair<std::string, RtVar> b;
+				if (FcRtParams[1].data.rfind("use", 0) == 0)
+					b = make_pair(FcRtParams[1].data.substr(3), FcRtParams[2]);
+				else b = make_pair(FcRtParams[1].data, FcRtParams[2]);
+				a->member.insert(b);
 			}
 		}
 	}

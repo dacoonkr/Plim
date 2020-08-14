@@ -7,6 +7,7 @@
 #include <iomanip>
 #include "classes.hpp"
 #include "limit.hpp"
+#include "memberPtr.hpp"
 
 namespace pl {
 	auto dtos(double f) -> std::string {
@@ -16,33 +17,6 @@ namespace pl {
 		size_t point = s.find('.');
 		s.erase(s.find_last_not_of('0') + 1, std::string::npos);
 		return (s[s.size() - 1] == '.') ? s.substr(0, s.size() - 1) : s;
-	}
-
-	auto getPtr(std::string name, std::map<std::string, pl::RtVar>& RtVars) -> RtVar* {
-		RtVar* finded = &RtVars[0];
-		bool isFirst = true;
-		std::string RtNow;
-		for (size_t i = 3; i < name.length(); i++) {
-			if (name[i] == ':') {
-				if (isFirst) {
-					isFirst = false;
-					finded = &RtVars[RtNow];
-				}
-				else {
-					if ('0' <= RtNow[0] && RtNow[0] <= '9')
-						finded = &(finded->children[stoi(RtNow)]);
-					else finded = &(finded->member[RtNow]);
-				}
-				RtNow.clear();
-			}
-			else RtNow += name[i];
-		}
-		if (!RtNow.empty()) {
-			if ('0' <= RtNow[0] && RtNow[0] <= '9')
-				finded = &(finded->children[stoi(RtNow)]);
-			else finded = &(finded->member[RtNow]);
-		}
-		return finded;
 	}
 
 	auto operation(std::string oper, std::stack<RtVar>& RtStk, std::map<std::string, pl::RtVar>& RtVars) -> void {
@@ -93,15 +67,6 @@ namespace pl {
 
 		if (oper == "/") {
 			RtVar tmp(2, dtos(stod(fValue.data) / stod(sValue.data)));
-			RtStk.push(tmp);
-			return;
-		}
-
-		if (oper == "==") {
-			int tmp2 = 0;
-			if (fValue.data == sValue.data && fValue.type == sValue.type)
-				tmp2 = 1;
-			RtVar tmp(1, std::to_string(tmp2));
 			RtStk.push(tmp);
 			return;
 		}
@@ -204,11 +169,19 @@ namespace pl {
 
 		if (oper == "->") {
 			if (fValue.data.rfind("use", 0) == 0) {
-				RtVar tmp(5, fValue.data + ':' + sValue.data);
+				RtVar tmp;
+				if (sValue.data.rfind("use", 0) == 0)
+					tmp = RtVar(5, fValue.data + ':' + sValue.data.substr(3));
+				else tmp = RtVar(5, fValue.data + ':' + sValue.data);
 				RtStk.push(tmp);
 			}
 			else {
-				RtVar tmp(fValue.children[stoi(sValue.data)]);
+				RtVar tmp;
+				if (sValue.data.rfind("use", 0) == 0)
+					tmp = fValue.member[sValue.data.substr(3)];
+				else if ('0' <= sValue.data[0] && sValue.data[0] <= '9')
+					tmp = fValue.children[stoi(sValue.data)];
+				else tmp = fValue.member[sValue.data];
 				RtStk.push(tmp);
 			}
 			return;
