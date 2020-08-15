@@ -4,13 +4,16 @@
 #include <vector>
 
 namespace pl {
+	class RtData;
+
 	class RtVar {
 	public:
-		int type = 0; // int: 1  float: 2  string: 3  array: 4  keyword: 5
+		int type = 0; // int: 1  float: 2  string: 3  array: 4  keyword: 5  command: 6
 		std::string data;
 
-		std::vector<pl::RtVar> children;
-		std::map<std::string, pl::RtVar> member;
+		std::vector<pl::RtVar> children; //배열 전용
+		std::map<std::string, pl::RtVar> member; //클래스 전용
+		std::vector<pl::RtData> commands; //명령어변수 전용
 
 		RtVar(int pr_type, std::string pr_data) {
 			type = pr_type;

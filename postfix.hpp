@@ -10,6 +10,7 @@ namespace pl {
 	auto CpClearOpratorStack(std::vector<pl::RtData>& CpPostfixing, std::stack<std::string>& CpOperator) -> void {
 		while (!CpOperator.empty()) {
 			if (CpOperator.top() == "(") return;
+			if (CpOperator.top() == "{") return;
 			CpPostfixing.push_back(RtData(1, CpOperator.top()));
 			CpOperator.pop();
 		}
@@ -20,28 +21,46 @@ namespace pl {
 			auto& nowline = parsedTree[pst];
 			std::vector<pl::RtData> CpPostfixing;
 			std::stack<std::string> CpOperator;
-			std::stack<size_t> CpBrace;
+			std::stack<size_t> CpParenthese;
+			std::stack<size_t> CpBraces;
 
 			for (size_t i = 0; i < nowline.codes.size(); i++) {
 				auto& now = nowline.codes[i];
 
 				if (now.type == 1) {
 					if (now.data == ",") {
-						size_t paramCnt = CpBrace.top();
-						CpBrace.pop();
-						CpBrace.push(paramCnt + 1);
+						size_t paramCnt = CpParenthese.top();
+						CpParenthese.pop();
+						CpParenthese.push(paramCnt + 1);
 						CpClearOpratorStack(CpPostfixing, CpOperator);
+					}
+					else if (now.data == "{") {
+						CpBraces.push(CpPostfixing.size());
+						CpOperator.push("{");
+					}
+					else if (now.data == "}") {
+						CpClearOpratorStack(CpPostfixing, CpOperator);
+						RtVar commands(6, "<Commands>");
+						size_t len = CpPostfixing.size() - CpBraces.top();
+						size_t start = CpBraces.top();
+						CpBraces.pop();
+						for (size_t i = 0; i < len; i++) {
+							commands.commands.push_back(CpPostfixing[start]);
+							CpPostfixing.erase(CpPostfixing.begin() + start);
+						}
+						CpOperator.pop();
+						CpPostfixing.push_back(RtData(3, commands));
 					}
 					else if (now.data == ";") {
 						CpClearOpratorStack(CpPostfixing, CpOperator);
 					}
 					else if (now.data == "(") {
 						CpOperator.push("(");
-						CpBrace.push(-1);
+						CpParenthese.push(-1);
 					}
 					else if (now.data == ")") {
-						size_t paramCnt = CpBrace.top();
-						CpBrace.pop();
+						size_t paramCnt = CpParenthese.top();
+						CpParenthese.pop();
 
 						if (paramCnt == -1) {
 							CpClearOpratorStack(CpPostfixing, CpOperator);
@@ -73,7 +92,7 @@ namespace pl {
 				else if (now.type == 4) {
 					CpOperator.push(now.data);
 					CpOperator.push("(");
-					CpBrace.push(1);
+					CpParenthese.push(1);
 					i++;
 				}
 				else {
