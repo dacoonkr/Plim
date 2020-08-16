@@ -73,6 +73,17 @@ namespace pl {
 				return;
 			}
 
+			if (func == "out") {
+				for (size_t i = 0; i < FcRtParams.size(); i++)
+					std::cout << FcRtParams[i].data;
+				return;
+			}
+
+			if (func == "Pack") {
+				RtStk.push(RtVar(7, FcRtParams[0].data));
+				return;
+			}
+
 			if (func == "execute") {
 				auto tmp2 = getCommandsVar(FcRtParams[0]);
 				RtExecute(tmp2, RtVars);
@@ -87,14 +98,25 @@ namespace pl {
 				}
 				return;
 			}
+
+			if (func == "if") {
+				if (FcRtParams[0].data != "0") {
+					auto tmp2 = getCommandsVar(FcRtParams[1]);
+					RtExecute(tmp2, RtVars);
+				}
+				return;
+			}
 		}
 
 		/* package Con */ {
-			if (func == "print") {
-				for (size_t i = 0; i < FcRtParams.size(); i++) {
-					std::cout << FcRtParams[i].data;
+			if (func == ":printf") {
+				auto& parent = RtStk.top();
+				if (parent.type == 7 && parent.data == "ConIO") {
+					for (size_t i = 0; i < FcRtParams.size(); i++) {
+						std::cout << FcRtParams[i].data;
+					}
+					return;
 				}
-				return;
 			}
 		}
 
@@ -138,7 +160,6 @@ namespace pl {
 				}
 			}
 		}
-
 
 		/* package Debug */ {
 			if (func == "addMember") {

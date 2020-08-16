@@ -6,6 +6,7 @@
 #include "plim.hpp"
 
 auto main() -> int {
+	setlocale(LC_ALL, "");
 	FAST_IO;
 
 	std::cout << "Plim(PT-1) Interpreter";

@@ -8,7 +8,7 @@ namespace pl {
 
 	class RtVar {
 	public:
-		int type = 0; // int: 1  float: 2  string: 3  array: 4  keyword: 5  command: 6
+		int type = 0; // int: 1  float: 2  string: 3  array: 4  keyword: 5  command: 6  package: 7
 		std::string data;
 
 		std::vector<pl::RtVar> children; //배열 전용
