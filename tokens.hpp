@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "classes.hpp"
+#include "syntax.hpp"
 
 char operators[] = { '(', ')', '+', '-', '*', '/', '^', ';', ',', '=', ':', '<', '>', '&', '|', '{', '}' };
 
@@ -109,5 +110,6 @@ namespace pl {
 			}
 		}
 		pl::CpLastComplete(CpNow, CpTokens);
+		checkSyntax(CpTokens);
 	}
 }

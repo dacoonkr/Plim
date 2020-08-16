@@ -1,14 +1,16 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include "classes.hpp"
 #include "operation.hpp"
 #include "memberPtr.hpp"
+#include "error.hpp"
 
 namespace pl {
-	auto function(std::string, std::stack<RtVar>&, int, std::map<std::string, pl::RtVar>&) -> void;
+	auto function(std::string, std::stack<RtVar>&, int, std::map<std::string, RtVar>&) -> void;
 
-	auto RtExecute(std::vector<ParseTree>& parsedTree, std::map<std::string, pl::RtVar>& RtVars) -> void {
+	auto RtExecute(std::vector<ParseTree>& parsedTree, std::map<std::string, RtVar>& RtVars) -> void {
 		for (size_t i = 0; i < parsedTree.size(); i++) {
 			bool goDown = false;
 
@@ -69,6 +71,12 @@ namespace pl {
 
 		/* System Function */ {
 			if (func == "exit") {
+				if (FcRtParams.size() != 1)
+					RtError(ParameterRequireError("exit(int)", 1));
+				if (FcRtParams[0].type != 1) {
+					std::vector<std::string> params = { "int" };
+					RtError(ParameterTypeError("exit(int)", params));
+				}
 				exit(stoi(FcRtParams[0].data));
 				return;
 			}
@@ -80,17 +88,35 @@ namespace pl {
 			}
 
 			if (func == "Pack") {
+				if (FcRtParams.size() != 1)
+					RtError(ParameterRequireError("Pack(string)", 1));
+				if (FcRtParams[0].type != 3) {
+					std::vector<std::string> params = { "string" };
+					RtError(ParameterTypeError("Pack(string)", params));
+				}
 				RtStk.push(RtVar(7, FcRtParams[0].data));
 				return;
 			}
 
 			if (func == "execute") {
+				if (FcRtParams.size() != 1)
+					RtError(ParameterRequireError("execute(<Commands>)", 1));
+				if (FcRtParams[0].type != 6) {
+					std::vector<std::string> params = { "<Commands>" };
+					RtError(ParameterTypeError("execute(<Commands>)", params));
+				}
 				auto tmp2 = getCommandsVar(FcRtParams[0]);
 				RtExecute(tmp2, RtVars);
 				return;
 			}
 
 			if (func == "repeat") {
+				if (FcRtParams.size() != 2)
+					RtError(ParameterRequireError("repeat(int, <Commands>)", 2));
+				if (FcRtParams[0].type != 1 || FcRtParams[1].type != 6) {
+					std::vector<std::string> params = { "int", "<Commands>" };
+					RtError(ParameterTypeError("repeat(int, <Commands>)", params));
+				}
 				auto count = std::stoi(FcRtParams[0].data);
 				for (int i = 0; i < count; i++) {
 					auto tmp2 = getCommandsVar(FcRtParams[1]);
@@ -100,6 +126,12 @@ namespace pl {
 			}
 
 			if (func == "if") {
+				if (FcRtParams.size() != 2)
+					RtError(ParameterRequireError("if(int, <Commands>)", 2));
+				if (FcRtParams[0].type != 1 || FcRtParams[1].type != 6) {
+					std::vector<std::string> params = { "int", "<Commands>" };
+					RtError(ParameterTypeError("if(int, <Commands>)", params));
+				}
 				if (FcRtParams[0].data != "0") {
 					auto tmp2 = getCommandsVar(FcRtParams[1]);
 					RtExecute(tmp2, RtVars);
@@ -108,12 +140,38 @@ namespace pl {
 			}
 		}
 
-		/* package Con */ {
-			if (func == ":printf") {
+		/* package ConIO */ {
+			if (func == ":print") {
 				auto& parent = RtStk.top();
 				if (parent.type == 7 && parent.data == "ConIO") {
 					for (size_t i = 0; i < FcRtParams.size(); i++) {
 						std::cout << FcRtParams[i].data;
+					}
+					return;
+				}
+			}
+
+			if (func == ":printf") {
+				auto& parent = RtStk.top();
+				if (parent.type == 7 && parent.data == "ConIO") {
+					if (FcRtParams.size() < 1)
+						RtError(ParameterRequireError("ConIO:printf(string, anytype...)", 2));
+					if (FcRtParams[0].type != 3) {
+						std::vector<std::string> params = { "string", "..." };
+						RtError(ParameterTypeError("ConIO:printf(string, anytype...)", params));
+					}
+					int got = 0;
+					for (size_t i = 0; i < FcRtParams[0].data.length(); i++) {
+						if (FcRtParams[0].data[i] == '%') {
+							i++;
+							if (FcRtParams[0].data[i + 1] == '%') {
+								std::cout << "%";
+							}
+							else if (FcRtParams[0].data[i + 1] == 'v') {
+								std::cout << FcRtParams[++got].data;
+							}
+						}
+						else std::cout << FcRtParams[0].data[i];
 					}
 					return;
 				}
@@ -139,22 +197,16 @@ namespace pl {
 					}
 				}
 				if (func == ":resize") {
+					if (FcRtParams.size() != 1)
+						RtError(ParameterRequireError("<Array>:resize(int)", 1));
+					if (FcRtParams[0].type != 1) {
+						std::vector<std::string> params = { "int" };
+						RtError(ParameterTypeError("<Array>:resize(int)", params));
+					}
 					auto& parent = RtStk.top();
 					if (parent.type == 4) {
 						while (parent.children.size() > (size_t)stoi(FcRtParams[0].data)) parent.children.pop_back();
 						while (parent.children.size() < (size_t)stoi(FcRtParams[0].data)) parent.children.push_back(RtVar(1, "0"));
-						return;
-					}
-				}
-				if (func == ":print") {
-					auto& parent = RtStk.top();
-					if (parent.type == 4) {
-						std::cout << "[";
-						for (size_t i = 0; i < parent.children.size(); i++) {
-							std::cout << parent.children[i].data;
-							if (i != parent.children.size() - 1) std::cout << ", ";
-						}
-						std::cout << "]";
 						return;
 					}
 				}
