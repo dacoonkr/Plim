@@ -18,6 +18,7 @@ namespace pl {
 		CpParsedTree.children.clear();
 
 		RtVars.insert(std::make_pair("void", RtVar(1, "0")));
+		RtVars.insert(std::make_pair("conio", RtVar(3, "ConIO")));
 
 		pl::CpSplitTokens(CpTokens, this_line);
 		pl::CpParseTree(CpTokens, CpParsedTree);

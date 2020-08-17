@@ -163,19 +163,71 @@ namespace pl {
 					int got = 0;
 					for (size_t i = 0; i < FcRtParams[0].data.length(); i++) {
 						if (FcRtParams[0].data[i] == '%') {
-							i++;
 							if (FcRtParams[0].data[i + 1] == '%') {
 								std::cout << "%";
+							}
+							else if (FcRtParams[0].data[i + 1] == 'r') {
+								auto arr = FcRtParams[++got].children;
+								std::cout << "[";
+								for (int i = 0; i < arr.size(); i++) {
+									std::cout << arr[i].data;
+									if (i != arr.size() - 1) std::cout << ", ";
+								}
+								std::cout << "]";
+							}
+							else if (FcRtParams[0].data[i + 1] == 'c') {
+								auto classes = FcRtParams[++got];
+								std::cout << "<" << classes.data;
+								for (auto it = classes.member.begin(); it != classes.member.end(); ++it) {
+									std::cout << " " << it->first << "=" << it->second.data;
+								}
+								std::cout << ">";
 							}
 							else if (FcRtParams[0].data[i + 1] == 'v') {
 								std::cout << FcRtParams[++got].data;
 							}
+							i++;
 						}
 						else std::cout << FcRtParams[0].data[i];
 					}
 					return;
 				}
 			}
+
+			if (func == ":scanf") {
+				auto& parent = RtStk.top();
+				if (parent.type == 7 && parent.data == "ConIO") {
+					if (FcRtParams.size() < 1)
+						RtError(ParameterRequireError("ConIO:scanf(string, use anytype...)", 2));
+					if (FcRtParams[0].type != 3) {
+						std::vector<std::string> params = { "string", "..." };
+						RtError(ParameterTypeError("ConIO:scanf(string, use anytype...)", params));
+					}
+					int got = 0;
+					for (size_t i = 0; i < FcRtParams[0].data.length(); i++) {
+						if (FcRtParams[0].data[i] == '%') {
+							if (FcRtParams[0].data[i + 1] == 'i') {
+								auto* want = getPtr(FcRtParams[++got].data, RtVars);
+								want->type = 1;
+								std::cin >> want->data;
+							}
+							else if (FcRtParams[0].data[i + 1] == 'f') {
+								auto* want = getPtr(FcRtParams[++got].data, RtVars);
+								want->type = 2;
+								std::cin >> want->data;
+							}
+							else if (FcRtParams[0].data[i + 1] == 's') {
+								auto* want = getPtr(FcRtParams[++got].data, RtVars);
+								want->type = 3;
+								std::cin >> want->data;
+							}
+							i++;
+						}
+					}
+					return;
+				}
+			}
+
 		}
 
 		/* package Array */ {

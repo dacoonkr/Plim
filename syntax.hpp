@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <stack>
-#include <iostream>
 #include "classes.hpp"
 #include "error.hpp"
 
@@ -16,8 +15,7 @@ namespace pl {
 			if (now.type == 1) {
 				if (i > 0) {
 					if (before.data != ")" && before.data != "}") {
-						if (before.type == 1)
-							CpError("Invalid Syntax");
+						if (before.type == 1) CpError("Invalid Syntax");
 					}
 				}
 				if (now.data == "(") StBracket.push("(");
@@ -40,16 +38,13 @@ namespace pl {
 			}
 			else {
 				if (i > 0) {
-					if (before.type != 1)
-						CpError("Invalid Syntax");
+					if (before.type != 1) CpError("Invalid Syntax");
 				}
 			}
 		}
 		if (!StBracket.empty()) {
-			if (StBracket.top() == "{")
-				CpError("{} is not matched.");
-			if (StBracket.top() == "(")
-				CpError("() is not matched.");
+			if (StBracket.top() == "{") CpError("{} is not matched.");
+			if (StBracket.top() == "(") CpError("() is not matched.");
 		}
 	}
 }
