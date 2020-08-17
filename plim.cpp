@@ -9,7 +9,8 @@ auto main() -> int {
 	setlocale(LC_ALL, "");
 	FAST_IO;
 
-	std::cout << "Plim(PT-1) Interpreter";
+	std::cout << "Plim Interpreter";
+
 	while (1) {
 		std::string this_line;
 		std::cout << "\n>>> ";
